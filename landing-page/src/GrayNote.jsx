@@ -19,7 +19,9 @@ import {
   ArrowDown,
   ChevronDown,
   X,
-  Search
+  Search,
+  CheckCircle,
+  Wand2
 } from 'lucide-react'
 
 // Gray-themed Note Component
@@ -40,6 +42,7 @@ const GrayNote = ({
   const [noteContent, setNoteContent] = useState(content);
   const textareaRef = useRef(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRephrasing, setIsRephrasing] = useState(false);
   const dragControls = useDragControls();
   const [showSidePanel, setShowSidePanel] = useState(false);
   const [selectedIntegration, setSelectedIntegration] = useState(null); // 'jira' or 'notion'
@@ -199,6 +202,70 @@ const GrayNote = ({
     onVariantChange?.("editing");
   };
 
+  // Rephrase function - AI-powered text rephrasing
+  const handleRephrase = useCallback(async () => {
+    if (!noteContent.trim() || isRephrasing) return;
+    
+    setIsRephrasing(true);
+    try {
+      // Simulate AI rephrasing (in production, this would call an AI API like OpenAI, Anthropic, etc.)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Enhanced rephrasing logic with common improvements
+      let rephrased = noteContent.trim();
+      
+      // Capitalize first letter
+      rephrased = rephrased.charAt(0).toUpperCase() + rephrased.slice(1);
+      
+      // Ensure proper sentence endings
+      if (!rephrased.match(/[.!?]$/)) {
+        rephrased += '.';
+      }
+      
+      // Simple word replacements for better clarity (can be replaced with actual AI)
+      const improvements = {
+        ' i ': ' I ',
+        ' dont ': " don't ",
+        ' cant ': " can't ",
+        ' wont ': " won't ",
+        ' its ': " it's ",
+        ' youre ': " you're ",
+        ' theyre ': " they're ",
+      };
+      
+      Object.entries(improvements).forEach(([old, newText]) => {
+        rephrased = rephrased.replace(new RegExp(old, 'gi'), newText);
+      });
+      
+      // In production, replace this with actual AI API call:
+      // const response = await fetch('/api/rephrase', {
+      //   method: 'POST',
+      //   body: JSON.stringify({ text: noteContent }),
+      // });
+      // const { rephrased } = await response.json();
+      
+      setNoteContent(rephrased);
+    } catch (error) {
+      console.error('Error rephrasing:', error);
+    } finally {
+      setIsRephrasing(false);
+    }
+  }, [noteContent, isRephrasing]);
+
+  // Handle check button - shrink to teardrop
+  const handleCheck = useCallback(async () => {
+    if (noteContent.trim() && !isSaving) {
+      setIsSaving(true);
+      try {
+        await onSave?.(noteContent);
+        // Change to teardrop variant after saving
+        onVariantChange?.("teardrop");
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  }, [noteContent, onSave, isSaving, onVariantChange]);
+
   const handleCommentClick = () => {
     onVariantChange?.("editing");
   };
@@ -344,6 +411,28 @@ const GrayNote = ({
               </button>
             </div>
 
+            {/* Check button - shrink to teardrop */}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCheck();
+              }}
+              className="p-2 rounded-lg transition-colors"
+              style={{
+                backgroundColor: "transparent",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "white";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
+              title="Save and shrink to teardrop"
+              disabled={!noteContent.trim() || isSaving}
+            >
+              <CheckCircle className={`h-4 w-4 ${noteContent.trim() ? 'text-gray-700' : 'text-gray-400'}`} />
+            </button>
+
             {/* Delete button */}
             <button 
               onClick={(e) => {
@@ -384,7 +473,7 @@ const GrayNote = ({
           />
         </div>
 
-        {/* Footer with @ and Image Icons */}
+        {/* Footer with @, Image, and Rephrase Icons */}
         <div 
           className="px-4 py-3 border-t flex items-center space-x-4"
           style={{ 
@@ -406,6 +495,23 @@ const GrayNote = ({
           >
             <Image className="h-4 w-4" />
             <span className="text-xs">Image</span>
+          </button>
+
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRephrase();
+            }}
+            disabled={!noteContent.trim() || isRephrasing}
+            className={`flex items-center space-x-1 transition-colors ${
+              noteContent.trim() && !isRephrasing
+                ? 'text-gray-600 hover:text-gray-800'
+                : 'text-gray-400 cursor-not-allowed'
+            }`}
+            title="Rephrase text (AI-powered)"
+          >
+            <Wand2 className={`h-4 w-4 ${isRephrasing ? 'animate-pulse' : ''}`} />
+            <span className="text-xs">Rephrase</span>
           </button>
         </div>
         </motion.div>
@@ -429,6 +535,38 @@ const GrayNote = ({
           <span className="text-green-600 font-bold text-lg">
             {author.charAt(0).toUpperCase()}
           </span>
+        </motion.div>
+      )}
+
+      {variant === "teardrop" && (
+        /* Teardrop Note Variant */
+        <motion.div
+          initial={{ scale: 1.2, opacity: 0, y: -10 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center relative"
+          style={{
+            width: '40px',
+            height: '52px',
+          }}
+          onClick={handleExpandNote}
+          title={`Click to expand note: ${noteContent.substring(0, 30)}${noteContent.length > 30 ? '...' : ''}`}
+        >
+          {/* Teardrop shape - circle with point at bottom */}
+          <svg
+            width="40"
+            height="52"
+            viewBox="0 0 40 52"
+            style={{ position: 'absolute', top: 0, left: 0 }}
+          >
+            <path
+              d="M 20 0 C 31.046 0 40 8.954 40 20 C 40 31.046 31.046 40 20 40 C 8.954 40 0 31.046 0 20 C 0 8.954 8.954 0 20 0 Z M 20 52 L 16 40 L 24 40 Z"
+              fill="#E8E8E8"
+              stroke="#4A4A4A"
+              strokeWidth="2"
+            />
+          </svg>
+          <FileText className="h-4 w-4 text-gray-700 relative z-10" />
         </motion.div>
       )}
 
