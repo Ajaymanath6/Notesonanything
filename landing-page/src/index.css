@@ -1,0 +1,109 @@
+/* Load Geist Font */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  /* NOA Dark Theme - Clean Black & White */
+  
+  /* Primary Colors - Simplified */
+  --color-primary-50: #0f0f1e;
+  --color-primary-100: #1a1a2e;
+  --color-primary-200: #16213e;
+  --color-primary-300: #1f2937;
+  --color-primary-400: #374151;
+  --color-primary-500: #ffffff;
+  --color-primary-600: #e5e5e5;
+  --color-primary-700: #d4d4d4;
+  --color-primary-800: #a3a3a3;
+  --color-primary-900: #737373;
+  --color-primary-950: #525252;
+
+  /* Background Colors - Pure Dark */
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #0a0a0a;
+  --color-bg-tertiary: #111111;
+  --color-bg-card: #111111;
+  --color-bg-hover: #1a1a1a;
+  --color-bg-white: #ffffff;
+
+  /* Text Colors - High Contrast */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #71717a;
+  --color-text-inverse: #000000;
+  --color-text-white-primary: #000000;
+  --color-text-white-secondary: #525252;
+
+  /* Minimal Accent Colors */
+  --color-accent: #ffffff;
+  --color-accent-hover: #f5f5f5;
+
+  /* Success/Error States - Minimal */
+  --color-success: #ffffff;
+  --color-warning: #ffffff;
+  --color-error: #ffffff;
+
+  /* Orange Accent (Keep for NOA brand) */
+  --color-orange-500: #f97316;
+
+  /* Border Colors - Subtle */
+  --color-border-primary: #262626;
+  --color-border-secondary: #1f1f1f;
+  --color-border-accent: #374151;
+  --color-border-white: #e5e5e7;
+
+  /* Glass/Blur Effects */
+  --color-glass: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+
+  /* Enhanced spacing scale */
+  --spacing: 0.25rem;
+  
+  /* Geist Typography */
+  --font-family-sans: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-family-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+
+  /* Minimal Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* NOA Dark Theme Base Styles */
+body {
+  font-family: var(--font-family-sans);
+  font-optical-sizing: auto;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* Dark theme scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-600);
+}
+
+@tailwind utilities;
+
+/* Custom utilities */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

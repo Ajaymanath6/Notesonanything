@@ -27,6 +27,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove submodule reference if exists
+        run: |
+          if [ -f .gitmodules ]; then
+            git submodule deinit -f landing-page || true
+            git rm --cached landing-page || true
+            rm -rf .git/modules/landing-page || true
+          fi
+          # Ensure landing-page directory exists with files
+          if [ ! -d "landing-page" ] || [ -z "$(ls -A landing-page 2>/dev/null)" ]; then
+            echo "Error: landing-page directory is missing or empty"
+            exit 1
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

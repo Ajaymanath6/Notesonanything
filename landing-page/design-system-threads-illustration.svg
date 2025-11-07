@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="600" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="yellowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF097;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFFBED;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,0,0,0.12)"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1000" height="600" fill="#f8fafc"/>
+  
+  <!-- Background decorations -->
+  <circle cx="120" cy="100" r="70" fill="#fef3c7" opacity="0.4"/>
+  <circle cx="680" cy="480" r="50" fill="#ddd6fe" opacity="0.4"/>
+  
+  <!-- Browser Window -->
+  <rect x="50" y="80" width="480" height="280" rx="12" fill="white" filter="url(#shadow)"/>
+  
+  <!-- Browser Chrome -->
+  <rect x="50" y="80" width="480" height="40" rx="12" fill="#f3f4f6"/>
+  <rect x="50" y="108" width="480" height="1" fill="#e5e7eb"/>
+  
+  <!-- Browser Controls -->
+  <circle cx="70" cy="100" r="6" fill="#f87171"/>
+  <circle cx="90" cy="100" r="6" fill="#fbbf24"/>
+  <circle cx="110" cy="100" r="6" fill="#34d399"/>
+  
+  <!-- URL Bar -->
+  <rect x="140" y="88" width="280" height="24" rx="6" fill="white"/>
+  <text x="150" y="103" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">🌐 app.designsystem.com/components</text>
+  
+  <!-- Active Thread Indicator -->
+  <rect x="430" y="94" width="12" height="12" rx="6" fill="#fbbf24"/>
+  <text x="448" y="103" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Active thread</text>
+  <circle cx="510" cy="100" r="3" fill="#eab308"/>
+  
+  <!-- Website Content - Design System -->
+  <rect x="70" y="140" width="440" height="200" fill="white"/>
+  
+  <!-- Header -->
+  <rect x="90" y="160" width="40" height="40" rx="8" fill="#4f46e5"/>
+  <text x="110" y="183" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="bold">DS</text>
+  <text x="140" y="175" font-family="Arial, sans-serif" font-size="14" fill="#111827" font-weight="bold">Design System</text>
+  <text x="140" y="190" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">v2.1.0</text>
+  
+  <!-- Action Buttons -->
+  <rect x="400" y="168" width="50" height="24" rx="4" fill="#e5e7eb"/>
+  <rect x="460" y="168" width="40" height="24" rx="4" fill="#4f46e5"/>
+  <text x="485" y="182" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Deploy</text>
+  
+  <!-- Component Grid -->
+  <rect x="90" y="210" width="180" height="80" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="100" y="225" font-family="Arial, sans-serif" font-size="10" fill="#374151" font-weight="bold">Button</text>
+  <rect x="100" y="235" width="60" height="24" rx="4" fill="#2563eb"/>
+  <text x="130" y="249" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Primary</text>
+  <rect x="100" y="265" width="80" height="8" rx="2" fill="#d1d5db"/>
+  
+  <rect x="280" y="210" width="180" height="80" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="290" y="225" font-family="Arial, sans-serif" font-size="10" fill="#374151" font-weight="bold">Input</text>
+  <rect x="290" y="235" width="150" height="24" rx="4" fill="white" stroke="#d1d5db"/>
+  <text x="295" y="249" font-family="Arial, sans-serif" font-size="9" fill="#9ca3af">Placeholder text</text>
+  
+  <!-- ThreadsNote Component -->
+  <g transform="translate(570, 80)">
+    <!-- Note Container -->
+    <rect x="0" y="0" width="320" height="400" rx="24" fill="white" filter="url(#shadow)"/>
+    
+    <!-- Note Header -->
+    <rect x="0" y="0" width="320" height="60" rx="24" fill="url(#yellowGradient)"/>
+    <rect x="0" y="36" width="320" height="24" fill="url(#yellowGradient)"/>
+    
+    <!-- Avatar -->
+    <circle cx="30" cy="30" r="16" fill="#372804"/>
+    <text x="30" y="35" font-family="Arial, sans-serif" font-size="12" fill="#FFF097" text-anchor="middle" font-weight="bold">AK</text>
+    
+    <!-- Author Info -->
+    <text x="55" y="25" font-family="Arial, sans-serif" font-size="12" fill="#372804" font-weight="bold">Alex Kim</text>
+    <text x="55" y="40" font-family="Arial, sans-serif" font-size="10" fill="#372804" opacity="0.7">5 min ago</text>
+    
+    <!-- Action Icons -->
+    <rect x="270" y="15" width="20" height="20" rx="4" fill="rgba(255,255,255,0.2)"/>
+    <text x="280" y="28" font-family="Arial, sans-serif" font-size="10" fill="#372804" text-anchor="middle">✏</text>
+    <rect x="295" y="15" width="20" height="20" rx="4" fill="rgba(255,255,255,0.2)"/>
+    <text x="305" y="28" font-family="Arial, sans-serif" font-size="10" fill="#372804" text-anchor="middle">🗑</text>
+    
+    <!-- Note Content -->
+    <rect x="10" y="70" width="300" height="60" fill="#FFFBED"/>
+    <text x="20" y="88" font-family="Arial, sans-serif" font-size="11" fill="#372804">Our button component needs accessibility</text>
+    <text x="20" y="102" font-family="Arial, sans-serif" font-size="11" fill="#372804">improvements. Current focus states don't</text>
+    <text x="20" y="116" font-family="Arial, sans-serif" font-size="11" fill="#372804">meet WCAG 2.1 AA standards.</text>
+    
+    <!-- Comments Section Header -->
+    <rect x="0" y="130" width="320" height="1" fill="#f59e0b" opacity="0.3"/>
+    <rect x="10" y="140" width="300" height="30" fill="#FFFBED"/>
+    <text x="20" y="155" font-family="Arial, sans-serif" font-size="10" fill="#92400e" font-weight="bold">💬 Comments (2)</text>
+    
+    <!-- Comment 1 with Reply -->
+    <rect x="15" y="175" width="290" height="55" rx="8" fill="#fef3c7"/>
+    <circle cx="30" cy="185" r="8" fill="#372804"/>
+    <text x="30" y="189" font-family="Arial, sans-serif" font-size="8" fill="#FFF097" text-anchor="middle" font-weight="bold">TS</text>
+    <text x="45" y="185" font-family="Arial, sans-serif" font-size="9" fill="#92400e" font-weight="bold">Taylor Swift</text>
+    <text x="45" y="195" font-family="Arial, sans-serif" font-size="8" fill="#92400e">I can add proper focus ring styles. 2px solid outline?</text>
+    <text x="45" y="205" font-family="Arial, sans-serif" font-size="8" fill="#92400e">💜 3   💬 Reply</text>
+    
+    <!-- Nested Reply -->
+    <rect x="35" y="210" width="260" height="15" rx="4" fill="#fbbf24" opacity="0.1"/>
+    <text x="40" y="220" font-family="Arial, sans-serif" font-size="7" fill="#92400e">Jordan Lee: Yes! Let's document this in guidelines.</text>
+    
+    <!-- Comment 2 -->
+    <rect x="15" y="240" width="290" height="40" rx="8" fill="#fef3c7"/>
+    <circle cx="30" cy="250" r="8" fill="#372804"/>
+    <text x="30" y="254" font-family="Arial, sans-serif" font-size="8" fill="#FFF097" text-anchor="middle" font-weight="bold">SC</text>
+    <text x="45" y="250" font-family="Arial, sans-serif" font-size="9" fill="#92400e" font-weight="bold">Sam Chen</text>
+    <text x="45" y="260" font-family="Arial, sans-serif" font-size="8" fill="#92400e">Legal: Affects government contracts. Critical priority.</text>
+    <text x="45" y="270" font-family="Arial, sans-serif" font-size="8" fill="#92400e">💜 1   💬 Reply</text>
+    
+    <!-- Add Comment Area -->
+    <rect x="15" y="340" width="290" height="30" rx="8" fill="rgba(255,255,255,0.8)" stroke="#f59e0b"/>
+    <text x="25" y="357" font-family="Arial, sans-serif" font-size="10" fill="#92400e" opacity="0.6">Add a comment...</text>
+    <rect x="270" y="350" width="30" height="20" rx="4" fill="#f59e0b"/>
+    <text x="285" y="362" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Send</text>
+  </g>
+  
+  <!-- Team Avatars (4 people) -->
+  <g transform="translate(600, 40)">
+    <circle cx="0" cy="0" r="14" fill="#f97316"/>
+    <text x="0" y="4" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle" font-weight="bold">AK</text>
+    <circle cx="20" cy="0" r="14" fill="#ec4899"/>
+    <text x="20" y="4" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle" font-weight="bold">TS</text>
+    <circle cx="40" cy="0" r="14" fill="#14b8a6"/>
+    <text x="40" y="4" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle" font-weight="bold">JL</text>
+    <circle cx="60" cy="0" r="14" fill="#6366f1"/>
+    <text x="60" y="4" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle" font-weight="bold">SC</text>
+    <text x="80" y="4" font-family="Arial, sans-serif" font-size="11" fill="#374151">4 people in thread</text>
+  </g>
+  
+  <!-- Design Discussion Badge -->
+  <rect x="550" y="50" width="140" height="30" rx="15" fill="url(#purpleGradient)"/>
+  <text x="620" y="68" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="bold">💬 Design Discussion</text>
+  
+  <!-- Cross-team Badge -->
+  <rect x="50" y="400" width="160" height="30" rx="15" fill="white" stroke="#e5e7eb" filter="url(#shadow)"/>
+  <text x="130" y="418" font-family="Arial, sans-serif" font-size="12" fill="#374151" text-anchor="middle" font-weight="bold">👥 Cross-team Alignment</text>
+  
+  <!-- Title -->
+  <text x="50" y="40" font-family="Arial, sans-serif" font-size="24" fill="#111827" font-weight="bold">Demo Section: Design System Accessibility</text>
+  <text x="50" y="60" font-family="Arial, sans-serif" font-size="14" fill="#6b7280">ThreadsNote collaboration on WCAG compliance improvements</text>
+</svg>

@@ -1,0 +1,59 @@
+image: node:18
+
+stages:
+  - build
+  - deploy
+
+cache:
+  paths:
+    - node_modules/
+
+before_script:
+  - npm ci
+
+build:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour
+  only:
+    - main
+    - master
+
+pages:
+  stage: deploy
+  script:
+    - rm -rf public
+    - mkdir public
+    - cp -r dist/* public/
+    # Create simple 404.html that redirects to index.html for Angular routing (root domain)
+    - |
+      cat > public/404.html << 'EOF'
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Redirecting...</title>
+        <script>
+          // Simple redirect to root for Angular SPA
+          window.location.replace('/');
+        </script>
+      </head>
+      <body>
+        <p>Redirecting...</p>
+      </body>
+      </html>
+      EOF
+    # Create _redirects file for proper SPA routing (backup method)
+    - echo "/*    /index.html   200" > public/_redirects
+  artifacts:
+    paths:
+      - public
+  dependencies:
+    - build
+  only:
+    - main
+    - master 
