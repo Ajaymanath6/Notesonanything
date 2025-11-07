@@ -65,7 +65,7 @@ const Auth = ({ onAuthSuccess }) => {
           {/* Logo */}
           <div className="flex items-center justify-center space-x-3 mb-8">
             <img 
-              src="/logo.svg" 
+              src={`${import.meta.env.BASE_URL || '/'}logo.svg`}
               alt="NOA Logo" 
               className="w-10 h-10"
             />
