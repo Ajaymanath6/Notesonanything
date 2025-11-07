@@ -1004,9 +1004,12 @@ function App() {
   const handleDeleteComment = useCallback(() => {}, []);
 
   // NOA Logo Component
-  const NOALogo = ({ className = "h-8 w-8" }) => (
-    <img src="/logo.svg" alt="NOA Logo" className={className} />
-  );
+  const NOALogo = ({ className = "h-8 w-8" }) => {
+    const baseUrl = import.meta.env.BASE_URL || '/';
+    return (
+      <img src={`${baseUrl}logo.svg`} alt="NOA Logo" className={className} />
+    );
+  };
 
   // Side Panel Component for Gray Notes with Sharing (Landing Page Theme)
   const SidePanel = ({
@@ -1076,7 +1079,7 @@ function App() {
                 title={isOpen ? "Close Notes Panel" : "Open Notes Panel"}
               >
     <img 
-      src="/logo.svg" 
+      src={`${import.meta.env.BASE_URL || '/'}logo.svg`}
                   alt="NOA"
                   style={{
                     width: "18px",
@@ -1742,7 +1745,7 @@ function App() {
               ease: "easeInOut",
             }}
           >
-            <img src="/logo.svg" alt="NOA Logo" className="w-16 h-16 mx-auto" />
+            <img src={`${import.meta.env.BASE_URL || '/'}logo.svg`} alt="NOA Logo" className="w-16 h-16 mx-auto" />
           </motion.div>
           
           {/* Loading Text */}
@@ -1953,7 +1956,7 @@ function App() {
                   <div className="relative inline-block">
                     Feedback faster
                     <img 
-                      src="/Scribble.svg" 
+                      src={`${import.meta.env.BASE_URL || '/'}Scribble.svg`}
                       alt="scribble decoration" 
                       className="absolute -right-8"
                       style={{ 
@@ -2021,7 +2024,7 @@ function App() {
                   Get the Extension - it&apos;s Free
                 </button>
                 <img 
-                  src="/tarce.svg" 
+                  src={`${import.meta.env.BASE_URL || '/'}tarce.svg`}
                   alt="trace decoration" 
                   className="mx-auto mt-4"
                   style={{ 
@@ -2052,7 +2055,7 @@ function App() {
                       loop
                       playsInline
                     >
-                      <source src="/noav" type="video/mp4" />
+                      <source src={`${import.meta.env.BASE_URL || '/'}noav`} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                   </div>
@@ -2159,7 +2162,7 @@ function App() {
               style={{ height: "", width: "" }}
             >
               <img
-                src="/hero2.png"
+                src={`${import.meta.env.BASE_URL || '/'}hero2.png`}
                 alt="Browser with annotation tools"
                 className="w-full h-full object-cover"
               />
@@ -2200,7 +2203,7 @@ function App() {
               style={{ height: "", width: "" }}
             >
               <img
-                src="/hero3.png"
+                src={`${import.meta.env.BASE_URL || '/'}hero3.png`}
                 alt="Team collaboration and sharing"
                 className="w-full h-full object-cover"
               />
