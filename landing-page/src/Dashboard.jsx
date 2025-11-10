@@ -1053,12 +1053,12 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                 }}
                 className="w-full flex items-center space-x-3 px-3 rounded-lg text-left transition-colors"
                 style={{
-                  backgroundColor: currentView === 'home' ? '#f8fafc' : 'transparent',
+                  backgroundColor: currentView === 'home' ? '#efefef' : 'transparent',
                   height: '40px'
                 }}
                 onMouseEnter={(e) => {
                   if (currentView !== 'home') {
-                    e.currentTarget.style.backgroundColor = '#f8fafc'
+                    e.currentTarget.style.backgroundColor = '#efefef'
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -1083,12 +1083,12 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                 }}
                 className="w-full flex items-center space-x-3 px-3 rounded-lg text-left transition-colors"
                 style={{
-                  backgroundColor: currentView === 'folders' ? '#f8fafc' : 'transparent',
+                  backgroundColor: currentView === 'folders' ? '#efefef' : 'transparent',
                   height: '40px'
                 }}
                 onMouseEnter={(e) => {
                   if (currentView !== 'folders') {
-                    e.currentTarget.style.backgroundColor = '#f8fafc'
+                    e.currentTarget.style.backgroundColor = '#efefef'
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -1109,9 +1109,9 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
 
           <button 
             className="w-full flex items-center space-x-2 px-3 py-2 text-sm rounded-lg transition-colors"
-            style={{ color: '#64748b', backgroundColor: '#f1f5f9' }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#e2e8f0'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#f1f5f9'}
+            style={{ color: '#64748b', backgroundColor: 'transparent' }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#efefef'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
             onClick={() => setShowWorkspacePopup(true)}
           >
             <Plus className="h-4 w-4" />
@@ -1492,7 +1492,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 p-6 overflow-y-auto relative z-10" style={{ paddingBottom: '80px' }} data-main-content>
+      <div className="flex-1 p-6 overflow-y-auto relative z-10" style={{ paddingBottom: '80px', backgroundColor: '#ffffff' }} data-main-content>
           {/* New Note Section */}
           <div className="max-w-4xl mx-auto">
             {/* Heading Group */}
@@ -1505,26 +1505,14 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
               </p>
             </div>
 
-            {/* Note Card */}
-            <NoteComponent 
-              onClick={() => {
-                if (onNavigate) {
-                  onNavigate('notedetail');
-                }
-              }}
-              isExpanded={isExpanded}
-            />
-
-            {/* Second Note Card */}
-            <div className="mt-6">
-              <NoteComponent 
-                onClick={() => {
-                  if (onNavigate) {
-                    onNavigate('notedetail');
-                  }
-                }}
-                isExpanded={isExpanded}
-              />
+            {/* Note Cards */}
+            <div className="flex flex-col" style={{ rowGap: '24px' }}>
+              {[0, 1, 2, 3].map((index) => (
+                <NoteComponent 
+                  key={index}
+                  isExpanded={isExpanded}
+                />
+              ))}
             </div>
           </div>
         </div>
