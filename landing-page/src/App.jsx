@@ -99,6 +99,7 @@ import OvalNoteThread from "./OvalNoteThread";
 import Auth from "./Auth";
 import Dashboard from "./Dashboard";
 import Canvas from "./Canvas";
+import NoteDetail from "./NoteDetail";
 import { 
   ArrowRight, 
   Check, 
@@ -1804,7 +1805,11 @@ function App() {
       ...ovalThreadNotes.map((note) => ({ ...note, type: "oval-thread" })),
     ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-    return <Dashboard userNotes={allUserNotes} onLogout={handleLogout} />;
+    return <Dashboard userNotes={allUserNotes} onLogout={handleLogout} onNavigate={setCurrentView} />;
+  }
+
+  if (currentView === "notedetail") {
+    return <NoteDetail onBack={() => setCurrentView("dashboard")} onLogout={handleLogout} />;
   }
 
   // Landing page view

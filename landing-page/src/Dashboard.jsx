@@ -27,12 +27,9 @@ import ThreadsNote from './ThreadsNote'
 import BlackNoteThread from './BlackNoteThread'
 import GrayNoteThread from './GrayNoteThread'
 import OvalNoteThread from './OvalNoteThread'
-import DashboardCompact from './DashboardCompact'
-import DashboardExpand from './DashboardExpand'
-import DashboardSimple from './DashboardSimple'
-import DashboardMain from './DashboardMain'
+import NoteComponent from './components/NoteComponent'
 
-const Dashboard = ({ userNotes = [], onLogout }) => {
+const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   // selectedWorkspace will be managed through activeWorkspace state
   const [aiSearchQuery, setAiSearchQuery] = useState('')
   const [aiSearchResults, setAiSearchResults] = useState(null)
@@ -48,6 +45,7 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
   const [sitesPage, setSitesPage] = useState(1)
   const [sitesPerPage] = useState(6) // Show 6 sites per page
   const [dashboardVersion, setDashboardVersion] = useState(1) // Track dashboard A/B testing version (1, 2, 3, 4, 5)
+  const [isExpanded, setIsExpanded] = useState(false) // Track if note card is expanded
   const [folders, setFolders] = useState(() => {
     const saved = localStorage.getItem('noa-folders')
     return saved ? JSON.parse(saved) : [
@@ -1020,7 +1018,7 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
       {/* Left Sidebar */}
       <div className="w-64 flex flex-col" style={{ backgroundColor: '#ffffff', borderRight: '1px solid #e2e8f0' }}>
         {/* Sidebar Header */}
-        <div className="p-6" style={{ borderBottom: '1px solid #e2e8f0' }}>
+        <div className="px-6 flex items-center" style={{ borderBottom: '1px solid #e2e8f0', height: '56px' }}>
           <div className="flex items-center space-x-3">
             <div 
               className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
@@ -1053,21 +1051,19 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
                   setCurrentView('home')
                   setSelectedFolder(null)
                 }}
-                className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors"
+                className="w-full flex items-center space-x-3 px-3 rounded-lg text-left transition-colors"
                 style={{
                   backgroundColor: currentView === 'home' ? '#f8fafc' : 'transparent',
-                  border: currentView === 'home' ? '1px solid #e2e8f0' : '1px solid transparent'
+                  height: '40px'
                 }}
                 onMouseEnter={(e) => {
                   if (currentView !== 'home') {
-                    e.target.style.backgroundColor = '#f8fafc'
-                    e.target.style.borderColor = '#e2e8f0'
+                    e.currentTarget.style.backgroundColor = '#f8fafc'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (currentView !== 'home') {
-                    e.target.style.backgroundColor = 'transparent'
-                    e.target.style.borderColor = 'transparent'
+                    e.currentTarget.style.backgroundColor = 'transparent'
                   }
                 }}
               >
@@ -1081,22 +1077,23 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
 
               {/* Folders Option */}
               <button
-                onClick={() => setCurrentView('folders')}
-                className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors"
+                onClick={() => {
+                  setCurrentView('folders')
+                  setSelectedFolder(null)
+                }}
+                className="w-full flex items-center space-x-3 px-3 rounded-lg text-left transition-colors"
                 style={{
                   backgroundColor: currentView === 'folders' ? '#f8fafc' : 'transparent',
-                  border: currentView === 'folders' ? '1px solid #e2e8f0' : '1px solid transparent'
+                  height: '40px'
                 }}
                 onMouseEnter={(e) => {
                   if (currentView !== 'folders') {
-                    e.target.style.backgroundColor = '#f8fafc'
-                    e.target.style.borderColor = '#e2e8f0'
+                    e.currentTarget.style.backgroundColor = '#f8fafc'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (currentView !== 'folders') {
-                    e.target.style.backgroundColor = 'transparent'
-                    e.target.style.borderColor = 'transparent'
+                    e.currentTarget.style.backgroundColor = 'transparent'
                   }
                 }}
               >
@@ -1112,14 +1109,77 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
 
           <button 
             className="w-full flex items-center space-x-2 px-3 py-2 text-sm rounded-lg transition-colors"
-            style={{ color: '#64748b', backgroundColor: '#f8fafc' }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#f8fafc'}
+            style={{ color: '#64748b', backgroundColor: '#f1f5f9' }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#e2e8f0'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#f1f5f9'}
             onClick={() => setShowWorkspacePopup(true)}
           >
             <Plus className="h-4 w-4" />
             <span>Add New Folder</span>
           </button>
+
+          {/* Divider */}
+          <div className="my-4" style={{ borderTop: '1px solid #e2e8f0' }}></div>
+
+          {/* Recent Notes Section */}
+          <div className="mb-3">
+            <h3 className="text-sm font-medium" style={{ color: '#1e293b' }}>
+              RECENT NOTES
+            </h3>
+          </div>
+          <div className="space-y-1">
+            {/* Tesla Motors Note */}
+            <button
+              onClick={() => {
+                if (onNavigate) {
+                  onNavigate('notedetail');
+                }
+              }}
+              className="w-full flex items-center space-x-3 rounded-lg cursor-pointer transition-colors text-left"
+              style={{ 
+                backgroundColor: 'transparent',
+                height: '36px',
+                padding: '4px 8px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f1f5f9';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <i className="ri-sticky-note-line text-lg flex-shrink-0" style={{ color: '#64748b' }}></i>
+              <div className="text-sm font-medium truncate flex-1" style={{ color: '#1e293b' }}>
+                Tesla Motors
+              </div>
+            </button>
+
+            {/* Second Note - Tesla Motors (same as displayed on dashboard) */}
+            <button
+              onClick={() => {
+                if (onNavigate) {
+                  onNavigate('notedetail');
+                }
+              }}
+              className="w-full flex items-center space-x-3 rounded-lg cursor-pointer transition-colors text-left"
+              style={{ 
+                backgroundColor: 'transparent',
+                height: '36px',
+                padding: '4px 8px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f1f5f9';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <i className="ri-sticky-note-line text-lg flex-shrink-0" style={{ color: '#64748b' }}></i>
+              <div className="text-sm font-medium truncate flex-1" style={{ color: '#1e293b' }}>
+                Tesla Motors
+              </div>
+            </button>
+          </div>
 
           {/* Folder List - Only show when in folders view */}
           {currentView === 'folders' && (
@@ -1193,7 +1253,7 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-0 relative">
+      <div className="flex-1 flex flex-col min-h-0 relative" style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)' }}>
         {/* Dot Pattern Background - Only for Version 1 */}
         {dashboardVersion === 1 && (
           <div 
@@ -1206,10 +1266,10 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
           />
         )}
         {/* Header */}
-        <header className="px-6 py-4 relative z-10" style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold" style={{ color: '#1e293b' }}>
+        <header className="px-6 relative z-10 flex items-center" style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', height: '56px' }}>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex flex-col justify-center" style={{ lineHeight: '1.2' }}>
+              <h1 className="font-bold" style={{ fontSize: '20px', color: '#1e293b', marginBottom: '2px', lineHeight: '1.2' }}>
                 {currentView === 'home' 
                   ? 'Dashboard' 
                   : selectedFolder 
@@ -1217,7 +1277,7 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
                     : 'Folders'
                 }
               </h1>
-              <p className="text-sm" style={{ color: '#64748b' }}>
+              <p style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.2', margin: '0' }}>
                 {currentView === 'home' 
                   ? 'Organize, collaborate, and manage your notes efficiently'
                   : selectedFolder
@@ -1240,7 +1300,7 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
                     onChange={(e) => setAiSearchQuery(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
                     placeholder="Ask AI about your notes..."
-                    className="pl-12 pr-12 py-3 rounded-xl text-sm focus:outline-none transition-all duration-200"
+                    className="pl-12 pr-12 py-2 rounded-xl text-sm focus:outline-none transition-all duration-200"
                     style={{ 
                       width: '400px',
                       backgroundColor: '#ffffff',
@@ -1387,13 +1447,13 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
 
               {/* Notifications */}
               <button 
-                className="p-2 rounded-lg transition-colors relative"
+                className="p-1.5 rounded-lg transition-colors relative"
                 style={{ color: '#64748b' }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'}
                 onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
               >
-                <Bell className="h-5 w-5" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                <Bell className="h-4 w-4" />
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></div>
               </button>
 
               {/* Simple Sign Out Button */}
@@ -1414,7 +1474,7 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
                     window.location.href = '/'
                   }
                 }}
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium"
+                className="flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all duration-200 text-xs font-medium"
                 style={{
                   backgroundColor: '#ef4444',
                   color: '#ffffff',
@@ -1424,7 +1484,7 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
                 onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
                 title="Sign out and return to landing page"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-3.5 w-3.5" />
                 <span>Sign Out</span>
               </button>
             </div>
@@ -1433,356 +1493,40 @@ const Dashboard = ({ userNotes = [], onLogout }) => {
 
         {/* Content Area */}
         <div className="flex-1 p-6 overflow-y-auto relative z-10" style={{ paddingBottom: '80px' }} data-main-content>
-          {/* Page Heading and Toolbar - Same Line */}
-          {/* Professional Header */}
-          <div className="mb-8">
-            {/* Main Header Row */}
-            <div className="flex items-center justify-between mb-4">
-              {/* Left: Workspace Title */}
-              <div className="flex items-center space-x-3">
-                <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: '#372804' }}
-                >
-                  <i className="ri-folder-3-line text-lg text-white"></i>
-                </div>
-                <div>
-                                  <h1 className="text-2xl font-bold" style={{ color: '#1e293b' }}>
-                  Design Team Workspace
-                </h1>
-                </div>
-              </div>
-
-            </div>
-
-
-          </div>
-
-          {/* Dashboard Version Toggle Buttons */}
-          <div className="mb-8">
-            <div className="flex items-center justify-center space-x-2">
-              <span className="text-sm font-medium mr-4" style={{ color: '#64748b' }}>
-                Dashboard Version:
-              </span>
-              
-              {[1, 2, 3, 4, 5].map((version) => (
-                <button
-                  key={version}
-                  onClick={() => setDashboardVersion(version)}
-                  className="w-8 h-8 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center"
-                  style={{
-                    backgroundColor: dashboardVersion === version ? '#372804' : '#ffffff',
-                    color: dashboardVersion === version ? '#FFF097' : '#64748b',
-                    border: dashboardVersion === version ? 'none' : '1px solid #e2e8f0',
-                    boxShadow: dashboardVersion === version ? '0 2px 4px rgba(55, 40, 4, 0.3)' : 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (dashboardVersion !== version) {
-                      e.target.style.backgroundColor = '#f8fafc';
-                      e.target.style.borderColor = '#cbd5e1';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (dashboardVersion !== version) {
-                      e.target.style.backgroundColor = '#ffffff';
-                      e.target.style.borderColor = '#e2e8f0';
-                    }
-                  }}
-                  title={`Switch to Dashboard Version ${version}${version === 1 ? ' (Current)' : version === 2 ? ' (Compact)' : version === 3 ? ' (Expand)' : version === 4 ? ' (Simple)' : ' (Main)'}`}
-                >
-                  {version}
-                </button>
-              ))}
-              
-              <div className="ml-4 text-xs" style={{ color: '#9ca3af' }}>
-                {dashboardVersion === 1 && 'Current Layout'}
-                {dashboardVersion === 2 && 'Compact Layout'}
-                {dashboardVersion === 3 && 'Expand Layout'}
-                {dashboardVersion === 4 && 'Simple Layout'}
-                {dashboardVersion === 5 && 'Main Layout'}
-              </div>
-            </div>
-          </div>
-
-          {/* Notes Display - Conditional based on dashboard version */}
-          {dashboardVersion === 1 && (
-            notes.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 px-4">
-              <div 
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
-                style={{ backgroundColor: '#f8fafc', border: '2px dashed #cbd5e1' }}
-              >
-                {currentView === 'home' ? (
-                  <i className="ri-sticky-note-line text-2xl" style={{ color: '#9ca3af' }}></i>
-                ) : (
-                  <i className="ri-folder-open-line text-2xl" style={{ color: '#9ca3af' }}></i>
-                )}
-              </div>
-              <h3 className="text-xl font-semibold mb-2" style={{ color: '#1e293b' }}>
-                {currentView === 'home' 
-                  ? 'No notes yet' 
-                  : selectedFolder 
-                    ? `No notes in "${selectedFolder.name}" folder`
-                    : 'Select a folder to view notes'
-                }
-              </h3>
-              <p className="text-sm text-center mb-6 max-w-md" style={{ color: '#64748b' }}>
-                {currentView === 'home' 
-                  ? 'Start creating your first note by going to the landing page and placing a note anywhere on the canvas. Your notes will appear here once created.'
-                  : selectedFolder
-                    ? `This folder is empty. Add notes to "${selectedFolder.name}" or create new notes from the landing page.`
-                    : 'Choose a folder from the sidebar to view its notes, or switch to Home to see all your notes.'
-                }
+          {/* New Note Section */}
+          <div className="max-w-4xl mx-auto">
+            {/* Heading Group */}
+            <div className="mb-8">
+              <h1 className="font-bold" style={{ fontSize: '20px', color: '#1e293b', marginBottom: '4px' }}>
+                New Note
+              </h1>
+              <p style={{ fontSize: '13px', color: '#64748b' }}>
+                Record meetings, upload Videos/Audios, Images, PDFs, Texts, Web Page URL, YouTube video link to create new notes.
               </p>
-              <div className="flex items-center space-x-4">
-                {currentView === 'home' ? (
-                  <button
-                    onClick={() => window.location.href = '/'}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
-                    style={{
-                      backgroundColor: '#372804',
-                      color: '#ffffff'
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2d1f02'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#372804'}
-                  >
-                    <i className="ri-add-line text-base"></i>
-                    <span>Create First Note</span>
-                  </button>
-                ) : selectedFolder ? (
-                  <button
-                    onClick={() => window.location.href = '/'}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
-                    style={{
-                      backgroundColor: selectedFolder.color,
-                      color: '#ffffff'
-                    }}
-                    onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-                    onMouseLeave={(e) => e.target.style.opacity = '1'}
-                  >
-                    <i className="ri-add-line text-base"></i>
-                    <span>Add Note to {selectedFolder.name}</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setCurrentView('home')}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
-                    style={{
-                      backgroundColor: '#372804',
-                      color: '#ffffff'
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2d1f02'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#372804'}
-                  >
-                    <i className="ri-home-line text-base"></i>
-                    <span>View All Notes</span>
-                  </button>
-                )}
-              </div>
             </div>
-          ) : (
-            <>
-              {/* Sites Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-4" style={{ columnGap: '20px', rowGap: '650px' }}>
-                {paginatedSites.map(([website, websiteNotes]) => (
-                <div key={website} className="flex flex-col">
-                  {/* Website Header - Only Once Per Website */}
-                  <div className="mb-4 px-2">
-                    <div className="flex items-center mb-2">
-                      <div className="flex items-center space-x-2">
-                        {website === 'figma.com' && <i className="ri-palette-line text-lg" style={{ color: '#f24e1e' }}></i>}
-                        {website === 'github.com' && <i className="ri-github-line text-lg" style={{ color: '#24292e' }}></i>}
-                        {website === 'notion.so' && <i className="ri-file-text-line text-lg" style={{ color: '#000000' }}></i>}
-                        {website === 'linear.app' && <i className="ri-bug-line text-lg" style={{ color: '#5e6ad2' }}></i>}
-                        {website === 'slack.com' && <i className="ri-slack-line text-lg" style={{ color: '#4a154b' }}></i>}
-                        {website === 'trello.com' && <i className="ri-trello-line text-lg" style={{ color: '#0079bf' }}></i>}
-                        {website === 'jira.atlassian.com' && <i className="ri-bug-2-line text-lg" style={{ color: '#0052cc' }}></i>}
-                        {website === 'asana.com' && <i className="ri-checkbox-circle-line text-lg" style={{ color: '#f06a6a' }}></i>}
-                        {website === 'miro.com' && <i className="ri-palette-2-line text-lg" style={{ color: '#ffd02f' }}></i>}
-                        {website === 'confluence.atlassian.com' && <i className="ri-book-open-line text-lg" style={{ color: '#0052cc' }}></i>}
-                        {website === 'discord.com' && <i className="ri-discord-line text-lg" style={{ color: '#5865f2' }}></i>}
-                        {website === 'airtable.com' && <i className="ri-table-line text-lg" style={{ color: '#18bfff' }}></i>}
-                        {!['figma.com', 'github.com', 'notion.so', 'linear.app', 'slack.com', 'trello.com', 'jira.atlassian.com', 'asana.com', 'miro.com', 'confluence.atlassian.com', 'discord.com', 'airtable.com'].includes(website) && <i className="ri-global-line text-lg" style={{ color: '#64748b' }}></i>}
-                        <h4 className="text-base font-semibold" style={{ color: '#1e293b' }}>
-                          {websiteNotes[0]?.websiteName || website || 'NOA Workspace'}
-                        </h4>
-                        {websiteNotes.length > 1 && (
-                          <button
-                            className="text-xs px-2 py-1 rounded-full font-medium transition-colors cursor-pointer ml-3"
-                            style={{ 
-                              backgroundColor: '#FFF097',
-                              color: '#372804',
-                              border: '1px solid #e4d6a7'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.target.style.backgroundColor = '#FFE066'
-                              e.target.style.transform = 'scale(1.05)'
-                            }}
-                            onMouseLeave={(e) => {
-                              e.target.style.backgroundColor = '#FFF097'
-                              e.target.style.transform = 'scale(1)'
-                            }}
-                            onClick={() => {
-                              setSelectedWebsite({ website, websiteNotes })
-                              setCurrentPage('website-notes')
-                            }}
-                            title={`Click to view all ${websiteNotes.length} notes from ${website}`}
-                          >
-                            {websiteNotes.length} notes
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 text-xs" style={{ color: '#64748b' }}>
-                      <div className="flex items-center space-x-1">
-                        <i className="ri-time-line"></i>
-                        <span>Latest: {websiteNotes[0]?.timestamp}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <i className="ri-user-line"></i>
-                        <span>by {websiteNotes[0]?.author || 'You'}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Stacked Notes Container - Same note stacked below showing bottom edges */}
-                  <div 
-                    className="relative" 
-                    data-note-id={websiteNotes[0]?.id}
-                  >
-                    {/* Background Note Stack - Show same note multiple times with bottom portions visible */}
-                    {websiteNotes.length > 1 && (
-                      <>
-                        {/* Stack 2-3 copies of the same note below the main one */}
-                        {Array.from({ length: Math.min(websiteNotes.length - 1, 3) }, (_, stackIndex) => (
-                          <div
-                            key={`stack-${stackIndex}`}
-                            className="absolute top-0 left-0 w-full"
-                            style={{
-                              transform: `translateY(${(stackIndex + 1) * 8}px) translateX(${(stackIndex + 1) * 2}px)`, // Offset down and slightly right
-                              zIndex: 5 - stackIndex, // Lower z-index for deeper stack items
-                              opacity: 0.6 - (stackIndex * 0.15), // Progressive fade: 0.6, 0.45, 0.3
-                              filter: 'blur(0.5px)' // Slight blur for depth
-                            }}
-                          >
-                            {/* Render same note with slight modifications for stack effect */}
-                            <div
-                              style={{
-                                transform: 'scale(0.98)', // Slightly smaller for depth
-                                transformOrigin: 'top left'
-                              }}
-                            >
-                              {renderNote(websiteNotes[0], stackIndex + 1)}
-                            </div>
-                          </div>
-                        ))}
-                      </>
-                    )}
-                    
-                    {/* Main Note (Top Card) */}
-                    <div 
-                      className="relative"
-                      style={{
-                        zIndex: 10 // Always on top
-                      }}
-                    >
-                      {renderNote(websiteNotes[0], 0)}
-                    </div>
-                  </div>
-                </div>
-                ))}
-              </div>
 
-              {/* Minimal Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="fixed bottom-0 left-0 right-0 flex items-center justify-center py-2 space-x-3 z-40" style={{ backgroundColor: 'rgba(248, 250, 252, 0.95)', borderTop: '1px solid #f1f5f9' }}>
-                  <button
-                    onClick={() => setSitesPage(Math.max(1, sitesPage - 1))}
-                    disabled={sitesPage === 1}
-                    className="flex items-center justify-center w-7 h-7 rounded-full transition-colors"
-                    style={{
-                      backgroundColor: sitesPage === 1 ? 'transparent' : '#ffffff',
-                      color: sitesPage === 1 ? '#cbd5e1' : '#64748b',
-                      border: sitesPage === 1 ? '1px solid #f1f5f9' : '1px solid #e5e7eb',
-                      cursor: sitesPage === 1 ? 'not-allowed' : 'pointer',
-                      boxShadow: sitesPage === 1 ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.05)'
-                    }}
-                  >
-                    <i className="ri-arrow-left-line text-xs"></i>
-                  </button>
+            {/* Note Card */}
+            <NoteComponent 
+              onClick={() => {
+                if (onNavigate) {
+                  onNavigate('notedetail');
+                }
+              }}
+              isExpanded={isExpanded}
+            />
 
-                  {/* Minimal Page Numbers */}
-                  <div className="flex items-center space-x-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => setSitesPage(page)}
-                        className="w-6 h-6 rounded-full text-xs font-medium transition-colors"
-                        style={{
-                          backgroundColor: page === sitesPage ? '#64748b' : 'transparent',
-                          color: page === sitesPage ? '#ffffff' : '#94a3b8',
-                          border: 'none'
-                        }}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => setSitesPage(Math.min(totalPages, sitesPage + 1))}
-                    disabled={sitesPage === totalPages}
-                    className="flex items-center justify-center w-7 h-7 rounded-full transition-colors"
-                    style={{
-                      backgroundColor: sitesPage === totalPages ? 'transparent' : '#ffffff',
-                      color: sitesPage === totalPages ? '#cbd5e1' : '#64748b',
-                      border: sitesPage === totalPages ? '1px solid #f1f5f9' : '1px solid #e5e7eb',
-                      cursor: sitesPage === totalPages ? 'not-allowed' : 'pointer',
-                      boxShadow: sitesPage === totalPages ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.05)'
-                    }}
-                  >
-                    <i className="ri-arrow-right-line text-xs"></i>
-                  </button>
-                </div>
-              )}
-
-              {/* Sites Summary */}
-              <div className="text-center mt-2 mb-16">
-                <p className="text-xs" style={{ color: '#9ca3af' }}>
-                  {startIndex + 1}-{Math.min(endIndex, totalSites)} of {totalSites} sites
-                </p>
-              </div>
-            </>
-          )
-          )}
-
-          {/* Dashboard Compact Version (Version 2) */}
-          {dashboardVersion === 2 && (
-            <div className="flex-1 overflow-hidden">
-              <DashboardCompact userNotes={notes} />
+            {/* Second Note Card */}
+            <div className="mt-6">
+              <NoteComponent 
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('notedetail');
+                  }
+                }}
+                isExpanded={isExpanded}
+              />
             </div>
-          )}
-
-          {/* Expand Dashboard Version (Version 3) */}
-          {dashboardVersion === 3 && (
-            <div className="flex-1 overflow-hidden">
-              <DashboardExpand userNotes={notes} />
-            </div>
-          )}
-
-          {/* Simple Dashboard Version (Version 4) */}
-          {dashboardVersion === 4 && (
-            <div className="flex-1 overflow-hidden">
-              <DashboardSimple userNotes={notes} />
-            </div>
-          )}
-
-          {/* Main Dashboard Version (Version 5) */}
-          {dashboardVersion === 5 && (
-            <div className="flex-1 overflow-hidden">
-              <DashboardMain userNotes={notes} />
-            </div>
-          )}
+          </div>
         </div>
       </div>
 
