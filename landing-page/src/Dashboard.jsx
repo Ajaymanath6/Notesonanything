@@ -64,6 +64,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   //   const saved = localStorage.getItem('noa-active-workspace')
   //   return saved ? JSON.parse(saved) : workspaces[0]
   // })
+  const [selectedRecentNote, setSelectedRecentNote] = useState(null)
 
   const searchRef = useRef(null)
   const workspacePopupRef = useRef(null)
@@ -1050,26 +1051,51 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                 onClick={() => {
                   setCurrentView('home')
                   setSelectedFolder(null)
+                  setSelectedRecentNote(null)
                 }}
                 className="w-full flex items-center space-x-3 px-3 rounded-lg text-left transition-colors"
                 style={{
-                  backgroundColor: currentView === 'home' ? '#efefef' : 'transparent',
+                  backgroundColor: currentView === 'home' && !selectedRecentNote ? '#efefef' : 'transparent',
                   height: '40px'
                 }}
                 onMouseEnter={(e) => {
-                  if (currentView !== 'home') {
+                  if (currentView !== 'home' || selectedRecentNote) {
                     e.currentTarget.style.backgroundColor = '#efefef'
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (currentView !== 'home') {
+                  if (currentView !== 'home' || selectedRecentNote) {
                     e.currentTarget.style.backgroundColor = 'transparent'
                   }
                 }}
               >
-                <i className="ri-home-line text-lg" style={{ color: currentView === 'home' ? '#372804' : '#64748b' }}></i>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 256 256"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{
+                    color: currentView === 'home' && !selectedRecentNote ? '#372804' : '#64748b',
+                    transition: 'color 0.2s ease'
+                  }}
+                >
+                  <rect width="256" height="256" fill="none" />
+                  <path
+                    d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z"
+                    opacity="0.2"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="16"
+                  />
+                </svg>
                 <div>
-                  <div className="text-sm font-medium" style={{ color: currentView === 'home' ? '#1e293b' : '#64748b' }}>
+                  <div className="text-sm font-medium" style={{ color: currentView === 'home' && !selectedRecentNote ? '#1e293b' : '#64748b' }}>
                     Home
                   </div>
                 </div>
@@ -1097,7 +1123,36 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   }
                 }}
               >
-                <i className="ri-folder-line text-lg" style={{ color: currentView === 'folders' ? '#372804' : '#64748b' }}></i>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 256 256"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ color: currentView === 'folders' ? '#372804' : '#64748b' }}
+                >
+                  <rect width="256" height="256" fill="none" />
+                  <path
+                    d="M98.34,50.34,128,80H32V56a8,8,0,0,1,8-8H92.69A8,8,0,0,1,98.34,50.34Z"
+                    opacity="0.2"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M216.89,208H39.38A7.4,7.4,0,0,1,32,200.62V80H216a8,8,0,0,1,8,8V200.89A7.11,7.11,0,0,1,216.89,208Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="16"
+                  />
+                  <path
+                    d="M32,80V56a8,8,0,0,1,8-8H92.69a8,8,0,0,1,5.65,2.34L128,80"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="16"
+                  />
+                </svg>
                 <div>
                   <div className="text-sm font-medium" style={{ color: currentView === 'folders' ? '#1e293b' : '#64748b' }}>
                     Folders
@@ -1131,26 +1186,112 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
             {/* Tesla Motors Note */}
             <button
               onClick={() => {
+                setSelectedRecentNote('tesla-primary')
                 if (onNavigate) {
                   onNavigate('notedetail');
                 }
               }}
               className="w-full flex items-center space-x-3 rounded-lg cursor-pointer transition-colors text-left"
               style={{ 
-                backgroundColor: 'transparent',
-                height: '36px',
+                backgroundColor: selectedRecentNote === 'tesla-primary' ? '#efefef' : 'transparent',
+                height: '40px',
                 padding: '4px 8px'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f1f5f9';
+                if (selectedRecentNote !== 'tesla-primary') {
+                  e.currentTarget.style.backgroundColor = '#efefef'
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                if (selectedRecentNote !== 'tesla-primary') {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                }
               }}
             >
-              <i className="ri-sticky-note-line text-lg flex-shrink-0" style={{ color: '#64748b' }}></i>
-              <div className="text-sm font-medium truncate flex-1" style={{ color: '#1e293b' }}>
-                Tesla Motors
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 256 256"
+                xmlns="http://www.w3.org/2000/svg"
+                className="flex-shrink-0"
+                style={{ color: '#64748b' }}
+              >
+                <rect width="256" height="256" fill="none" />
+                <path
+                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+                  opacity="0.2"
+                  fill="currentColor"
+                />
+                <line
+                  x1="96"
+                  y1="128"
+                  x2="160"
+                  y2="128"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="96"
+                  y1="160"
+                  x2="160"
+                  y2="160"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <path
+                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="80"
+                  y1="24"
+                  x2="80"
+                  y2="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="128"
+                  y1="24"
+                  x2="128"
+                  y2="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="176"
+                  y1="24"
+                  x2="176"
+                  y2="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+              </svg>
+              <div
+                className="text-sm font-medium truncate flex-1"
+                style={{ color: '#1e293b' }}
+                title="https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation"
+              >
+                https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation
               </div>
             </button>
 
@@ -1174,9 +1315,198 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              <i className="ri-sticky-note-line text-lg flex-shrink-0" style={{ color: '#64748b' }}></i>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 256 256"
+                xmlns="http://www.w3.org/2000/svg"
+                className="flex-shrink-0"
+                style={{ color: '#64748b' }}
+              >
+                <rect width="256" height="256" fill="none" />
+                <path
+                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+                  opacity="0.2"
+                  fill="currentColor"
+                />
+                <line
+                  x1="96"
+                  y1="128"
+                  x2="160"
+                  y2="128"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="96"
+                  y1="160"
+                  x2="160"
+                  y2="160"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <path
+                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="80"
+                  y1="24"
+                  x2="80"
+                  y2="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="128"
+                  y1="24"
+                  x2="128"
+                  y2="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="176"
+                  y1="24"
+                  x2="176"
+                  y2="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+              </svg>
               <div className="text-sm font-medium truncate flex-1" style={{ color: '#1e293b' }}>
                 Tesla Motors
+              </div>
+            </button>
+
+            {/* Third Note - Tesla Motors (same as displayed on dashboard) */}
+            <button
+              onClick={() => {
+                setSelectedRecentNote('tesla-secondary')
+                if (onNavigate) {
+                  onNavigate('notedetail');
+                }
+              }}
+              className="w-full flex items-center space-x-3 rounded-lg cursor-pointer transition-colors text-left"
+              style={{ 
+                backgroundColor: selectedRecentNote === 'tesla-secondary' ? '#efefef' : 'transparent',
+                height: '40px',
+                padding: '4px 8px'
+              }}
+              onMouseEnter={(e) => {
+                if (selectedRecentNote !== 'tesla-secondary') {
+                  e.currentTarget.style.backgroundColor = '#efefef'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedRecentNote !== 'tesla-secondary') {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                }
+              }}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 256 256"
+                xmlns="http://www.w3.org/2000/svg"
+                className="flex-shrink-0"
+                style={{ color: '#64748b' }}
+              >
+                <rect width="256" height="256" fill="none" />
+                <path
+                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+                  opacity="0.2"
+                  fill="currentColor"
+                />
+                <line
+                  x1="96"
+                  y1="128"
+                  x2="160"
+                  y2="128"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="96"
+                  y1="160"
+                  x2="160"
+                  y2="160"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <path
+                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="80"
+                  y1="24"
+                  x2="80"
+                  y2="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="128"
+                  y1="24"
+                  x2="128"
+                  y2="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="176"
+                  y1="24"
+                  x2="176"
+                  y2="56"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+              </svg>
+              <div
+                className="text-sm font-medium truncate flex-1"
+                style={{ color: '#1e293b' }}
+                title="https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation"
+              >
+                https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation
               </div>
             </button>
           </div>
@@ -1498,10 +1828,10 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
             {/* Heading Group */}
             <div className="mb-8">
               <h1 className="font-bold" style={{ fontSize: '20px', color: '#1e293b', marginBottom: '4px' }}>
-                New Note
+                All Notes
               </h1>
-              <p style={{ fontSize: '13px', color: '#64748b' }}>
-                Record meetings, upload Videos/Audios, Images, PDFs, Texts, Web Page URL, YouTube video link to create new notes.
+              <p style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.6' }}>
+                Capture every conversation and context in one workspace. Upload meeting recordings, drop in PDFs or design files, paste research links, or clip entire pages—Hyprnote transforms them into richly structured notes your team can search, share, and build on together.
               </p>
             </div>
 

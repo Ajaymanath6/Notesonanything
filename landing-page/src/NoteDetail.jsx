@@ -59,7 +59,31 @@ const NoteDetail = ({ onBack, onLogout }) => {
                   }
                 }}
               >
-                <i className="ri-home-line text-lg" style={{ color: selectedSidebarItem === 'home' ? '#372804' : '#64748b' }}></i>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 256 256"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{
+                    color: selectedSidebarItem === 'home' ? '#372804' : '#64748b',
+                    transition: 'color 0.2s ease'
+                  }}
+                >
+                  <rect width="256" height="256" fill="none" />
+                  <path
+                    d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z"
+                    opacity="0.2"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="16"
+                  />
+                </svg>
                 <div>
                   <div className="text-sm font-medium" style={{ color: selectedSidebarItem === 'home' ? '#1e293b' : '#64748b' }}>
                     Home
@@ -86,7 +110,36 @@ const NoteDetail = ({ onBack, onLogout }) => {
                   }
                 }}
               >
-                <i className="ri-folder-line text-lg" style={{ color: selectedSidebarItem === 'folders' ? '#372804' : '#64748b' }}></i>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 256 256"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ color: selectedSidebarItem === 'folders' ? '#372804' : '#64748b' }}
+                >
+                  <rect width="256" height="256" fill="none" />
+                  <path
+                    d="M98.34,50.34,128,80H32V56a8,8,0,0,1,8-8H92.69A8,8,0,0,1,98.34,50.34Z"
+                    opacity="0.2"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M216.89,208H39.38A7.4,7.4,0,0,1,32,200.62V80H216a8,8,0,0,1,8,8V200.89A7.11,7.11,0,0,1,216.89,208Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="16"
+                  />
+                  <path
+                    d="M32,80V56a8,8,0,0,1,8-8H92.69a8,8,0,0,1,5.65,2.34L128,80"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="16"
+                  />
+                </svg>
                 <div>
                   <div className="text-sm font-medium" style={{ color: selectedSidebarItem === 'folders' ? '#1e293b' : '#64748b' }}>
                     Folders
