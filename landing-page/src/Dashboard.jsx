@@ -47,8 +47,8 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   const [dashboardVersion, setDashboardVersion] = useState(1) // Track dashboard A/B testing version (1, 2, 3, 4, 5)
   const [isExpanded, setIsExpanded] = useState(false) // Track if note card is expanded
   const [folders, setFolders] = useState(() => {
-     const saved = localStorage.getItem('noa-folders')
-     return saved ? JSON.parse(saved) : [
+    const saved = localStorage.getItem('noa-folders')
+    return saved ? JSON.parse(saved) : [
       { id: 1, name: 'Favorites', description: 'Pinned notes across the workspace', color: '#fdd835' },
       { id: 2, name: 'Design Notes', description: 'UI/UX design related notes', color: '#f97316' },
       { id: 3, name: 'Development', description: 'Code and technical notes', color: '#3b82f6' },
@@ -654,8 +654,8 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
         return allNotes
       }
       return allNotes.filter((note) => {
-        const matchKey = note.website || note.websiteName || note.siteName
-        return matchKey === selectedPage.id
+        const matchKey = note.website || note.websiteName || note.siteName || note.pageUrl || note.siteUrl
+        return matchKey === selectedPage.key || matchKey === selectedPage.id
       })
     }
     
@@ -665,22 +665,73 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   const notes = getFilteredNotes()
 
   const uniquePages = useMemo(() => {
+    const sourceNotes = userNotes.length > 0 ? userNotes : mockNotes
+
     const seen = new Set()
-    const pages = []
-    notes.forEach((note) => {
-      const pageKey = note.website || note.websiteName || note.siteName || 'unknown'
-      if (!seen.has(pageKey)) {
-        seen.add(pageKey)
-        const label = note.websiteName || note.website || note.siteName || 'Untitled page'
-        pages.push({
-          id: pageKey,
-          label,
-          fullUrl: note.pageUrl || note.siteUrl || note.website || ''
-        })
+    const entries = []
+
+    const extractMetadata = (note) => {
+      const rawUrl = note.pageUrl || note.siteUrl || note.website || ''
+      let normalizedUrl = rawUrl
+      let hostname = ''
+      let pageName = note.websiteName || note.siteName || ''
+      const fallbackKey = note.website || note.websiteName || note.siteName || rawUrl || 'unknown'
+      let pathLabel = ''
+
+      if (rawUrl) {
+        try {
+          const parsed = rawUrl.startsWith('http') ? new URL(rawUrl) : new URL(`https://${rawUrl}`)
+          normalizedUrl = parsed.href
+          hostname = parsed.hostname.replace(/^www\./, '')
+          const segments = parsed.pathname.split('/').filter(Boolean)
+          if (segments.length) {
+            pageName = decodeURIComponent(segments[segments.length - 1]).replace(/[-_]+/g, ' ')
+            pathLabel = segments.slice(0, segments.length - 1).join('/')
+          } else {
+            pageName = hostname
+            pathLabel = ''
+          }
+        } catch (error) {
+          pageName = pageName || rawUrl
+        }
       }
+
+      if (!pageName) {
+        pageName = 'Untitled page'
+      }
+
+      const formattedName = pageName.replace(/\b\w/g, (char) => char.toUpperCase())
+      const displayTitle = hostname
+        ? pathLabel
+          ? `${hostname} / ${formattedName}`
+          : `${hostname} / ${formattedName}`
+        : formattedName
+
+      return {
+        key: fallbackKey,
+        id: normalizedUrl || fallbackKey,
+        pageName: formattedName,
+        displayUrl: normalizedUrl || rawUrl,
+        hostname: hostname || note.website || 'unknown',
+        displayTitle
+      }
+    }
+
+    sourceNotes.forEach((note) => {
+      const metadata = extractMetadata(note)
+      if (!metadata.displayUrl) {
+        return
+      }
+      const uniqueKey = metadata.key || metadata.id
+      if (seen.has(uniqueKey)) {
+        return
+      }
+      seen.add(uniqueKey)
+      entries.push(metadata)
     })
-    return pages
-  }, [notes])
+
+    return entries
+  }, [userNotes])
 
   // Group notes by website
   const notesByWebsite = notes.reduce((acc, note) => {
@@ -1121,17 +1172,21 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
               <h1 className="font-bold" style={{ fontSize: '20px', color: '#1e293b', marginBottom: '2px', lineHeight: '1.2' }}>
                 {currentView === 'home' 
                   ? 'Dashboard' 
+                  : currentView === 'pages' && selectedPage
+                    ? selectedPage.pageName
                   : selectedFolder 
                     ? selectedFolder.name
-                    : 'Folders'
+                      : currentView.charAt(0).toUpperCase() + currentView.slice(1)
                 }
               </h1>
               <p style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.2', margin: '0' }}>
                 {currentView === 'home' 
                   ? 'Organize, collaborate, and manage your notes efficiently'
+                  : currentView === 'pages' && selectedPage
+                    ? `Viewing every note captured on ${selectedPage.displayUrl}`
                   : selectedFolder
                     ? selectedFolder.description
-                    : 'Select a folder to view its notes'
+                      : 'Browse and organize your notebooks'
                 }
               </p>
             </div>
@@ -1347,9 +1402,9 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
             {/* Heading Group */}
             <div className="mb-8 space-y-6">
               <div>
-                <h1 className="font-bold" style={{ fontSize: '20px', color: '#1e293b', marginBottom: '4px' }}>
+              <h1 className="font-bold" style={{ fontSize: '20px', color: '#1e293b', marginBottom: '4px' }}>
                   My Notebook
-                </h1>
+              </h1>
                 <p style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.4', margin: 0 }}>
                   Capture every research artifact, meeting insight, and stray idea—Hyprnote turns them into a connected knowledge base your team can act on.
                 </p>
@@ -1478,7 +1533,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                         )}
                         {isPages && pagesDropdownOpen && (
                           <div
-                            className="absolute left-0 top-full mt-2 w-56 rounded-xl border text-sm font-medium overflow-hidden"
+                            className="absolute left-0 top-full mt-2 w-72 rounded-xl border text-sm font-medium overflow-hidden"
                             style={{
                               backgroundColor: '#ffffff',
                               borderColor: '#e2e8f0',
@@ -1492,13 +1547,20 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                               uniquePages.map((page) => (
                                 <button
                                   key={page.id}
-                                  className="w-full flex items-center justify-between px-3 py-2 transition-colors"
-                                  style={{ color: '#1e293b' }}
+                                  className="w-full flex items-start justify-between px-3 py-2 transition-colors text-left"
+                                  style={{
+                                    color: '#1e293b',
+                                    backgroundColor: selectedPage?.id === page.id ? '#efefef' : 'transparent'
+                                  }}
                                   onMouseEnter={(event) => {
-                                    event.currentTarget.style.backgroundColor = '#efefef'
+                                    if (selectedPage?.id !== page.id) {
+                                      event.currentTarget.style.backgroundColor = '#efefef'
+                                    }
                                   }}
                                   onMouseLeave={(event) => {
-                                    event.currentTarget.style.backgroundColor = 'transparent'
+                                    if (selectedPage?.id !== page.id) {
+                                      event.currentTarget.style.backgroundColor = 'transparent'
+                                    }
                                   }}
                                   onClick={() => {
                                     setSelectedPage(page)
@@ -1507,9 +1569,25 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                                     setSelectedFolder(null)
                                   }}
                                 >
-                                  <span className="truncate" style={{ maxWidth: '80%' }}>
-                                    {page.label}
-                                  </span>
+                                  <div className="flex items-start gap-2">
+                                    <div className="mt-0.5">
+                                      <i className="ri-file-list-2-line text-sm" style={{ color: '#64748b' }}></i>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                      <span className="font-medium" style={{ color: '#1e293b' }}>
+                                        {page.displayTitle}
+                                      </span>
+                                      <span className="flex items-center gap-2 text-xs" style={{ color: '#64748b', maxWidth: '240px' }}>
+                                        <i className="ri-link text-xs"></i>
+                                        <span className="truncate" style={{ maxWidth: '220px' }}>
+                                          {page.displayUrl.replace(/^https?:\/\//, '')}
+                                        </span>
+                                      </span>
+                                      <span className="text-xs" style={{ color: '#94a3b8' }}>
+                                        See all notes on this page in {page.hostname.replace(/^www\./, '')}
+                                      </span>
+                                    </div>
+                                  </div>
                                   <i className="ri-arrow-right-up-line text-xs" style={{ color: '#64748b' }}></i>
                                 </button>
                               ))
