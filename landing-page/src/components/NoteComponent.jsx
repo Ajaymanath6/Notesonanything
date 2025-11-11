@@ -767,7 +767,10 @@ const NoteComponent = ({ onClick, isExpanded }) => {
           </div>
         </div>
 
-        <label className="flex items-start gap-3 px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-xs text-slate-600 cursor-pointer transition-colors hover:border-slate-300">
+        <label
+          className="flex items-start gap-3 px-3 py-2 border border-slate-200 rounded-lg text-xs text-slate-600 cursor-pointer transition-colors hover:border-slate-300"
+          style={{ backgroundColor: 'rgba(239, 239, 239, 0.7)' }}
+        >
           <input
             type="checkbox"
             checked={notionIncludeContent}
@@ -776,6 +779,9 @@ const NoteComponent = ({ onClick, isExpanded }) => {
               setNotionIncludeContent(event.target.checked)
             }}
             className="mt-0.5 h-4 w-4 border border-slate-300 rounded text-slate-800 focus:ring-slate-400"
+            style={{
+              backgroundColor: '#efefef'
+            }}
           />
           <span>
             <span className="block font-medium text-slate-700">Include note content</span>
@@ -823,9 +829,18 @@ const NoteComponent = ({ onClick, isExpanded }) => {
           </div>
           <button
             className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            style={{
+              color: '#94a3b8'
+            }}
             onClick={(event) => {
               event.stopPropagation()
               handleCancel()
+            }}
+            onMouseEnter={(event) => {
+              event.currentTarget.style.backgroundColor = '#efefef'
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.backgroundColor = 'transparent'
             }}
           >
             <i className="ri-close-line text-base text-slate-500"></i>
@@ -836,10 +851,17 @@ const NoteComponent = ({ onClick, isExpanded }) => {
 
         <div className="flex items-center gap-3 pt-3 border-t border-slate-200">
           <button
-            className="flex-1 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+            className="flex-1 py-2 rounded-lg text-slate-700 text-sm font-medium transition-colors"
+            style={{ backgroundColor: '#efefef' }}
             onClick={(event) => {
               event.stopPropagation()
               handleCancel()
+            }}
+            onMouseEnter={(event) => {
+              event.currentTarget.style.backgroundColor = '#efefef'
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.backgroundColor = '#efefef'
             }}
           >
             Cancel

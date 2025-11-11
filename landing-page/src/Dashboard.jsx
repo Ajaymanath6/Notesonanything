@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { 
-  Plus,
   Search,
   Bell,
   User,
@@ -28,6 +27,7 @@ import BlackNoteThread from './BlackNoteThread'
 import GrayNoteThread from './GrayNoteThread'
 import OvalNoteThread from './OvalNoteThread'
 import NoteComponent from './components/NoteComponent'
+import Sidebar from './components/Sidebar'
 
 const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   // selectedWorkspace will be managed through activeWorkspace state
@@ -47,11 +47,12 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   const [dashboardVersion, setDashboardVersion] = useState(1) // Track dashboard A/B testing version (1, 2, 3, 4, 5)
   const [isExpanded, setIsExpanded] = useState(false) // Track if note card is expanded
   const [folders, setFolders] = useState(() => {
-    const saved = localStorage.getItem('noa-folders')
-    return saved ? JSON.parse(saved) : [
-      { id: 1, name: 'Design Notes', description: 'UI/UX design related notes', color: '#f97316' },
-      { id: 2, name: 'Development', description: 'Code and technical notes', color: '#3b82f6' },
-      { id: 3, name: 'Ideas', description: 'Random thoughts and ideas', color: '#10b981' }
+     const saved = localStorage.getItem('noa-folders')
+     return saved ? JSON.parse(saved) : [
+      { id: 1, name: 'Favorites', description: 'Pinned notes across the workspace', color: '#fdd835' },
+      { id: 2, name: 'Design Notes', description: 'UI/UX design related notes', color: '#f97316' },
+      { id: 3, name: 'Development', description: 'Code and technical notes', color: '#3b82f6' },
+      { id: 4, name: 'Ideas', description: 'Random thoughts and ideas', color: '#10b981' }
     ]
   })
   // const [workspaces] = useState(() => {
@@ -65,6 +66,50 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   //   return saved ? JSON.parse(saved) : workspaces[0]
   // })
   const [selectedRecentNote, setSelectedRecentNote] = useState(null)
+  const [selectedPage, setSelectedPage] = useState(null)
+  const [folderDropdownOpen, setFolderDropdownOpen] = useState(false)
+  const [pagesDropdownOpen, setPagesDropdownOpen] = useState(false)
+  const folderDropdownRef = useRef(null)
+  const pagesDropdownRef = useRef(null)
+
+  const sidebarRecentNotes = useMemo(
+    () => Array.from({ length: 4 }).map((_, idx) => ({
+      id: `recent-note-${idx + 1}`,
+      label: 'https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation'
+    })),
+    []
+  )
+
+  const handleSelectView = (view) => {
+    setCurrentView(view)
+    setSelectedFolder(null)
+    setSelectedPage(null)
+    setSelectedRecentNote(null)
+    setFolderDropdownOpen(false)
+    setPagesDropdownOpen(false)
+    if (view === 'folders' && folders.length > 0) {
+      setSelectedFolder(folders[0])
+    }
+    if (view === 'pages' && uniquePages.length > 0) {
+      setSelectedPage(uniquePages[0])
+    }
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (folderDropdownRef.current && !folderDropdownRef.current.contains(event.target)) {
+        setFolderDropdownOpen(false)
+      }
+      if (pagesDropdownRef.current && !pagesDropdownRef.current.contains(event.target)) {
+        setPagesDropdownOpen(false)
+      }
+    }
+
+    if (folderDropdownOpen || pagesDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [folderDropdownOpen, pagesDropdownOpen])
 
   const searchRef = useRef(null)
   const workspacePopupRef = useRef(null)
@@ -585,7 +630,10 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
     if (currentView === 'home') {
       // Home shows all notes
       return allNotes
-    } else if (currentView === 'folders' && selectedFolder) {
+    } else if (currentView === 'folders') {
+      if (!selectedFolder) {
+        return allNotes
+      }
       // Filter notes by selected folder
       // For now, we'll simulate folder filtering - in a real app, notes would have folderId
       return allNotes.filter(note => {
@@ -596,8 +644,18 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
           return note.website === 'github.com' || note.content.toLowerCase().includes('code')
         } else if (selectedFolder.name === 'Ideas') {
           return note.website === 'notion.so' || note.content.toLowerCase().includes('idea')
+        } else if (selectedFolder.name === 'Favorites') {
+          return note.likes > 0
         }
         return false
+      })
+    } else if (currentView === 'pages') {
+      if (!selectedPage) {
+        return allNotes
+      }
+      return allNotes.filter((note) => {
+        const matchKey = note.website || note.websiteName || note.siteName
+        return matchKey === selectedPage.id
       })
     }
     
@@ -605,6 +663,24 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   }
   
   const notes = getFilteredNotes()
+
+  const uniquePages = useMemo(() => {
+    const seen = new Set()
+    const pages = []
+    notes.forEach((note) => {
+      const pageKey = note.website || note.websiteName || note.siteName || 'unknown'
+      if (!seen.has(pageKey)) {
+        seen.add(pageKey)
+        const label = note.websiteName || note.website || note.siteName || 'Untitled page'
+        pages.push({
+          id: pageKey,
+          label,
+          fullUrl: note.pageUrl || note.siteUrl || note.website || ''
+        })
+      }
+    })
+    return pages
+  }, [notes])
 
   // Group notes by website
   const notesByWebsite = notes.reduce((acc, note) => {
@@ -1016,571 +1092,14 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
 
   return (
     <div className="min-h-screen flex" style={{ backgroundColor: '#f8fafc' }}>
-      {/* Left Sidebar */}
-      <div className="w-64 flex flex-col" style={{ backgroundColor: '#ffffff', borderRight: '1px solid #e2e8f0' }}>
-        {/* Sidebar Header */}
-        <div className="px-6 flex items-center" style={{ borderBottom: '1px solid #e2e8f0', height: '56px' }}>
-          <div className="flex items-center space-x-3">
-            <div 
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
-              style={{ 
-                backgroundColor: '#372804',
-                color: '#FFF097'
-              }}
-            >
-              N
-            </div>
-            <span className="text-lg font-semibold" style={{ color: '#1e293b' }}>
-              NOA
-            </span>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex-1 p-4">
-          <div className="mb-6">
-            <div className="mb-3">
-              <h3 className="text-sm font-medium" style={{ color: '#1e293b' }}>
-                Navigation
-              </h3>
-            </div>
-            
-            <div className="space-y-1">
-              {/* Home Option */}
-              <button
-                onClick={() => {
-                  setCurrentView('home')
-                  setSelectedFolder(null)
-                  setSelectedRecentNote(null)
-                }}
-                className="w-full flex items-center space-x-3 px-3 rounded-lg text-left transition-colors"
-                style={{
-                  backgroundColor: currentView === 'home' && !selectedRecentNote ? '#efefef' : 'transparent',
-                  height: '40px'
-                }}
-                onMouseEnter={(e) => {
-                  if (currentView !== 'home' || selectedRecentNote) {
-                    e.currentTarget.style.backgroundColor = '#efefef'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (currentView !== 'home' || selectedRecentNote) {
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                  }
-                }}
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 256 256"
-                  xmlns="http://www.w3.org/2000/svg"
-                  style={{
-                    color: currentView === 'home' && !selectedRecentNote ? '#372804' : '#64748b',
-                    transition: 'color 0.2s ease'
-                  }}
-                >
-                  <rect width="256" height="256" fill="none" />
-                  <path
-                    d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z"
-                    opacity="0.2"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="16"
-                  />
-                </svg>
-                <div>
-                  <div className="text-sm font-medium" style={{ color: currentView === 'home' && !selectedRecentNote ? '#1e293b' : '#64748b' }}>
-                    Home
-                  </div>
-                </div>
-              </button>
-
-              {/* Folders Option */}
-              <button
-                onClick={() => {
-                  setCurrentView('folders')
-                  setSelectedFolder(null)
-                }}
-                className="w-full flex items-center space-x-3 px-3 rounded-lg text-left transition-colors"
-                style={{
-                  backgroundColor: currentView === 'folders' ? '#efefef' : 'transparent',
-                  height: '40px'
-                }}
-                onMouseEnter={(e) => {
-                  if (currentView !== 'folders') {
-                    e.currentTarget.style.backgroundColor = '#efefef'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (currentView !== 'folders') {
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                  }
-                }}
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 256 256"
-                  xmlns="http://www.w3.org/2000/svg"
-                  style={{ color: currentView === 'folders' ? '#372804' : '#64748b' }}
-                >
-                  <rect width="256" height="256" fill="none" />
-                  <path
-                    d="M98.34,50.34,128,80H32V56a8,8,0,0,1,8-8H92.69A8,8,0,0,1,98.34,50.34Z"
-                    opacity="0.2"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M216.89,208H39.38A7.4,7.4,0,0,1,32,200.62V80H216a8,8,0,0,1,8,8V200.89A7.11,7.11,0,0,1,216.89,208Z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="16"
-                  />
-                  <path
-                    d="M32,80V56a8,8,0,0,1,8-8H92.69a8,8,0,0,1,5.65,2.34L128,80"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="16"
-                  />
-                </svg>
-                <div>
-                  <div className="text-sm font-medium" style={{ color: currentView === 'folders' ? '#1e293b' : '#64748b' }}>
-                    Folders
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <button 
-            className="w-full flex items-center space-x-2 px-3 py-2 text-sm rounded-lg transition-colors"
-            style={{ color: '#64748b', backgroundColor: 'transparent' }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#efefef'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-            onClick={() => setShowWorkspacePopup(true)}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add New Folder</span>
-          </button>
-
-          {/* Divider */}
-          <div className="my-4" style={{ borderTop: '1px solid #e2e8f0' }}></div>
-
-          {/* Recent Notes Section */}
-          <div className="mb-3">
-            <h3 className="text-sm font-medium" style={{ color: '#1e293b' }}>
-              RECENT NOTES
-            </h3>
-          </div>
-          <div className="space-y-1">
-            {/* Tesla Motors Note */}
-            <button
-              onClick={() => {
-                setSelectedRecentNote('tesla-primary')
-                if (onNavigate) {
-                  onNavigate('notedetail');
-                }
-              }}
-              className="w-full flex items-center space-x-3 rounded-lg cursor-pointer transition-colors text-left"
-              style={{ 
-                backgroundColor: selectedRecentNote === 'tesla-primary' ? '#efefef' : 'transparent',
-                height: '40px',
-                padding: '4px 8px'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedRecentNote !== 'tesla-primary') {
-                  e.currentTarget.style.backgroundColor = '#efefef'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedRecentNote !== 'tesla-primary') {
-                  e.currentTarget.style.backgroundColor = 'transparent'
-                }
-              }}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 256 256"
-                xmlns="http://www.w3.org/2000/svg"
-                className="flex-shrink-0"
-                style={{ color: '#64748b' }}
-              >
-                <rect width="256" height="256" fill="none" />
-                <path
-                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                  opacity="0.2"
-                  fill="currentColor"
-                />
-                <line
-                  x1="96"
-                  y1="128"
-                  x2="160"
-                  y2="128"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="96"
-                  y1="160"
-                  x2="160"
-                  y2="160"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <path
-                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="80"
-                  y1="24"
-                  x2="80"
-                  y2="56"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="128"
-                  y1="24"
-                  x2="128"
-                  y2="56"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="176"
-                  y1="24"
-                  x2="176"
-                  y2="56"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-              </svg>
-              <div
-                className="text-sm font-medium truncate flex-1"
-                style={{ color: '#1e293b' }}
-                title="https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation"
-              >
-                https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation
-              </div>
-            </button>
-
-            {/* Second Note - Tesla Motors (same as displayed on dashboard) */}
-            <button
-              onClick={() => {
-                if (onNavigate) {
-                  onNavigate('notedetail');
-                }
-              }}
-              className="w-full flex items-center space-x-3 rounded-lg cursor-pointer transition-colors text-left"
-              style={{ 
-                backgroundColor: 'transparent',
-                height: '36px',
-                padding: '4px 8px'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f1f5f9';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 256 256"
-                xmlns="http://www.w3.org/2000/svg"
-                className="flex-shrink-0"
-                style={{ color: '#64748b' }}
-              >
-                <rect width="256" height="256" fill="none" />
-                <path
-                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                  opacity="0.2"
-                  fill="currentColor"
-                />
-                <line
-                  x1="96"
-                  y1="128"
-                  x2="160"
-                  y2="128"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="96"
-                  y1="160"
-                  x2="160"
-                  y2="160"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <path
-                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="80"
-                  y1="24"
-                  x2="80"
-                  y2="56"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="128"
-                  y1="24"
-                  x2="128"
-                  y2="56"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="176"
-                  y1="24"
-                  x2="176"
-                  y2="56"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-              </svg>
-              <div className="text-sm font-medium truncate flex-1" style={{ color: '#1e293b' }}>
-                Tesla Motors
-              </div>
-            </button>
-
-            {/* Third Note - Tesla Motors (same as displayed on dashboard) */}
-            <button
-              onClick={() => {
-                setSelectedRecentNote('tesla-secondary')
-                if (onNavigate) {
-                  onNavigate('notedetail');
-                }
-              }}
-              className="w-full flex items-center space-x-3 rounded-lg cursor-pointer transition-colors text-left"
-              style={{ 
-                backgroundColor: selectedRecentNote === 'tesla-secondary' ? '#efefef' : 'transparent',
-                height: '40px',
-                padding: '4px 8px'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedRecentNote !== 'tesla-secondary') {
-                  e.currentTarget.style.backgroundColor = '#efefef'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedRecentNote !== 'tesla-secondary') {
-                  e.currentTarget.style.backgroundColor = 'transparent'
-                }
-              }}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 256 256"
-                xmlns="http://www.w3.org/2000/svg"
-                className="flex-shrink-0"
-                style={{ color: '#64748b' }}
-              >
-                <rect width="256" height="256" fill="none" />
-                <path
-                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                  opacity="0.2"
-                  fill="currentColor"
-                />
-                <line
-                  x1="96"
-                  y1="128"
-                  x2="160"
-                  y2="128"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="96"
-                  y1="160"
-                  x2="160"
-                  y2="160"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <path
-                  d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="80"
-                  y1="24"
-                  x2="80"
-                  y2="56"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="128"
-                  y1="24"
-                  x2="128"
-                  y2="56"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-                <line
-                  x1="176"
-                  y1="24"
-                  x2="176"
-                  y2="56"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="16"
-                />
-              </svg>
-              <div
-                className="text-sm font-medium truncate flex-1"
-                style={{ color: '#1e293b' }}
-                title="https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation"
-              >
-                https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation
-              </div>
-            </button>
-          </div>
-
-          {/* Folder List - Only show when in folders view */}
-          {currentView === 'folders' && (
-            <div className="mt-6">
-              <div className="mb-3">
-                <h3 className="text-sm font-medium" style={{ color: '#1e293b' }}>
-                  Your Folders
-                </h3>
-              </div>
-              <div className="space-y-1">
-                {folders.map((folder) => (
-                  <button
-                    key={folder.id}
-                    onClick={() => setSelectedFolder(folder)}
-                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors"
-                    style={{
-                      backgroundColor: selectedFolder?.id === folder.id ? '#f8fafc' : 'transparent',
-                      border: selectedFolder?.id === folder.id ? '1px solid #e2e8f0' : '1px solid transparent'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (selectedFolder?.id !== folder.id) {
-                        e.target.style.backgroundColor = '#f8fafc'
-                        e.target.style.borderColor = '#e2e8f0'
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedFolder?.id !== folder.id) {
-                        e.target.style.backgroundColor = 'transparent'
-                        e.target.style.borderColor = 'transparent'
-                      }
-                    }}
-                  >
-                    <div 
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: folder.color }}
-                    ></div>
-                    <div className="flex-1">
-                      <div className="text-sm font-medium" style={{ 
-                        color: selectedFolder?.id === folder.id ? '#1e293b' : '#64748b' 
-                      }}>
-                        {folder.name}
-                      </div>
-                      <div className="text-xs" style={{ color: '#94a3b8' }}>
-                        {folder.description}
-                      </div>
-                    </div>
-                    {selectedFolder?.id === folder.id && (
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#372804' }}></div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-
-
-        {/* Sidebar Footer */}
-        <div className="p-4" style={{ borderTop: '1px solid #e2e8f0' }}>
-          <button 
-            className="w-full flex items-center space-x-2 px-3 py-2 text-sm rounded-lg transition-colors"
-            style={{ color: '#64748b' }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-          >
-            <Settings className="h-4 w-4" />
-            <span>Settings</span>
-          </button>
-        </div>
-      </div>
+      <Sidebar
+        currentView={currentView}
+        onSelectView={handleSelectView}
+        onAddFolder={() => setShowWorkspacePopup(true)}
+        recentNotes={sidebarRecentNotes}
+        selectedRecentNote={selectedRecentNote}
+        onSelectRecentNote={setSelectedRecentNote}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-0 relative" style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)' }}>
@@ -1826,13 +1345,224 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
           {/* New Note Section */}
           <div className="max-w-4xl mx-auto">
             {/* Heading Group */}
-            <div className="mb-8">
-              <h1 className="font-bold" style={{ fontSize: '20px', color: '#1e293b', marginBottom: '4px' }}>
-                All Notes
-              </h1>
-              <p style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.6' }}>
-                Capture every conversation and context in one workspace. Upload meeting recordings, drop in PDFs or design files, paste research links, or clip entire pages—Hyprnote transforms them into richly structured notes your team can search, share, and build on together.
-              </p>
+            <div className="mb-8 space-y-6">
+              <div>
+                <h1 className="font-bold" style={{ fontSize: '20px', color: '#1e293b', marginBottom: '4px' }}>
+                  My Notebook
+                </h1>
+                <p style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.4', margin: 0 }}>
+                  Capture every research artifact, meeting insight, and stray idea—Hyprnote turns them into a connected knowledge base your team can act on.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  {['All Notes', 'Folders', 'Pages', 'Tags'].map((label) => {
+                    const isFolders = label === 'Folders'
+                    const isPages = label === 'Pages'
+                    const isAllNotes = label === 'All Notes'
+                    const isSelected = isAllNotes
+                      ? currentView === 'home' && !selectedFolder && !selectedPage
+                      : isFolders
+                        ? currentView === 'folders'
+                        : isPages
+                          ? currentView === 'pages'
+                        : currentView === label.toLowerCase()
+
+                    const handleClick = (event) => {
+                      if (isAllNotes) {
+                        handleSelectView('home')
+                      } else if (isFolders) {
+                        event.stopPropagation()
+                        setCurrentView('folders')
+                        setFolderDropdownOpen((prev) => !prev)
+                        setPagesDropdownOpen(false)
+                        if (!selectedFolder && folders.length > 0) {
+                          setSelectedFolder(folders[0])
+                        }
+                      } else if (isPages) {
+                        event.stopPropagation()
+                        setCurrentView('pages')
+                        setPagesDropdownOpen((prev) => !prev)
+                        setFolderDropdownOpen(false)
+                        if (!selectedPage && uniquePages.length > 0) {
+                          setSelectedPage(uniquePages[0])
+                        }
+                      } else {
+                        setCurrentView(label.toLowerCase())
+                        setFolderDropdownOpen(false)
+                        setPagesDropdownOpen(false)
+                      }
+                    }
+
+                    return (
+                      <div
+                        key={label}
+                        className="relative"
+                        ref={isFolders ? folderDropdownRef : isPages ? pagesDropdownRef : null}
+                      >
+                        <button
+                          className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
+                          style={{
+                            backgroundColor: isSelected ? '#efefef' : '#ffffff',
+                            color: '#1e293b',
+                            border: '2px solid #e2e8f0',
+                            boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
+                          }}
+                          onClick={handleClick}
+                        >
+                          {label}
+                          {(isFolders || isPages) && (
+                            <i
+                              className={`ri-arrow-down-s-line text-xs transition-transform ${
+                                (isFolders && folderDropdownOpen) || (isPages && pagesDropdownOpen) ? 'rotate-180' : 'rotate-0'
+                              }`}
+                              style={{ color: '#64748b' }}
+                            ></i>
+                          )}
+                        </button>
+                        {isFolders && folderDropdownOpen && (
+                          <div
+                            className="absolute left-0 top-full mt-2 w-48 rounded-xl border text-sm font-medium overflow-hidden"
+                            style={{
+                              backgroundColor: '#ffffff',
+                              borderColor: '#e2e8f0',
+                              boxShadow: '0 10px 15px rgba(15, 23, 42, 0.08)',
+                              zIndex: 3000
+                            }}
+                          >
+                            <button
+                              className="w-full flex items-center justify-between px-3 py-2 transition-colors"
+                              style={{ color: '#1e293b' }}
+                              onClick={() => {
+                                setShowWorkspacePopup(true)
+                                setFolderDropdownOpen(false)
+                              }}
+                            >
+                              <span>Add folder</span>
+                              <i className="ri-add-line text-sm" style={{ color: '#64748b' }}></i>
+                            </button>
+                            <div className="border-t" style={{ borderColor: '#e2e8f0' }}></div>
+                            {folders.map((folder) => (
+                              <button
+                                key={folder.id}
+                                className="w-full flex items-center justify-between px-3 py-2 transition-colors"
+                                style={{
+                                  color: '#1e293b',
+                                  backgroundColor: selectedFolder?.id === folder.id ? '#efefef' : 'transparent'
+                                }}
+                                onMouseEnter={(event) => {
+                                  if (selectedFolder?.id !== folder.id) {
+                                    event.currentTarget.style.backgroundColor = '#efefef'
+                                  }
+                                }}
+                                onMouseLeave={(event) => {
+                                  if (selectedFolder?.id !== folder.id) {
+                                    event.currentTarget.style.backgroundColor = 'transparent'
+                                  }
+                                }}
+                                onClick={() => {
+                                  setSelectedFolder(folder)
+                                  setCurrentView('folders')
+                                  setFolderDropdownOpen(false)
+                                }}
+                              >
+                                <span>{folder.name}</span>
+                                <span
+                                  className="w-2 h-2 rounded-full"
+                                  style={{ backgroundColor: folder.color }}
+                                ></span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {isPages && pagesDropdownOpen && (
+                          <div
+                            className="absolute left-0 top-full mt-2 w-56 rounded-xl border text-sm font-medium overflow-hidden"
+                            style={{
+                              backgroundColor: '#ffffff',
+                              borderColor: '#e2e8f0',
+                              boxShadow: '0 10px 15px rgba(15, 23, 42, 0.08)',
+                              zIndex: 3000
+                            }}
+                          >
+                            {uniquePages.length === 0 ? (
+                              <div className="px-3 py-2 text-xs text-slate-500">No pages captured yet</div>
+                            ) : (
+                              uniquePages.map((page) => (
+                                <button
+                                  key={page.id}
+                                  className="w-full flex items-center justify-between px-3 py-2 transition-colors"
+                                  style={{ color: '#1e293b' }}
+                                  onMouseEnter={(event) => {
+                                    event.currentTarget.style.backgroundColor = '#efefef'
+                                  }}
+                                  onMouseLeave={(event) => {
+                                    event.currentTarget.style.backgroundColor = 'transparent'
+                                  }}
+                                  onClick={() => {
+                                    setSelectedPage(page)
+                                    setCurrentView('pages')
+                                    setPagesDropdownOpen(false)
+                                    setSelectedFolder(null)
+                                  }}
+                                >
+                                  <span className="truncate" style={{ maxWidth: '80%' }}>
+                                    {page.label}
+                                  </span>
+                                  <i className="ri-arrow-right-up-line text-xs" style={{ color: '#64748b' }}></i>
+                                </button>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                      <i className="ri-search-2-line text-sm" style={{ color: '#64748b' }}></i>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Search notes..."
+                      className="pl-12 pr-4 py-2 rounded-xl text-sm focus:outline-none transition-all duration-200"
+                      style={{
+                        width: '280px',
+                        backgroundColor: '#ffffff',
+                        border: '2px solid #e2e8f0',
+                        color: '#1e293b',
+                        boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
+                      }}
+                      onFocus={(event) => {
+                        event.target.style.borderColor = '#efefef'
+                        event.target.style.backgroundColor = '#efefef'
+                        event.target.style.boxShadow = '0 0 0 2px rgba(16, 24, 40, 0.08)'
+                      }}
+                      onBlur={(event) => {
+                        event.target.style.borderColor = '#e2e8f0'
+                        event.target.style.backgroundColor = '#ffffff'
+                        event.target.style.boxShadow = '0 1px 2px rgba(16, 24, 40, 0.05)'
+                      }}
+                    />
+                  </div>
+                  <button
+                    className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
+                    style={{
+                      backgroundColor: '#ffffff',
+                      color: '#1e293b',
+                      border: '2px solid #e2e8f0',
+                      boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
+                    }}
+                  >
+                    <i className="ri-arrow-up-down-line text-sm" style={{ color: '#64748b' }}></i>
+                    Sort
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Note Cards */}

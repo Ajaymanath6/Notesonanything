@@ -1,231 +1,38 @@
-import { useState } from 'react';
-import { ArrowLeft, Bell, LogOut, Plus, Settings, Home } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { ArrowLeft, Bell, LogOut, Settings, Home } from 'lucide-react';
+import Sidebar from './components/Sidebar';
 import NoteInDetail from './noteindetail/NoteInDetail';
 
 const NoteDetail = ({ onBack, onLogout }) => {
   const [selectedSidebarItem, setSelectedSidebarItem] = useState('home');
-  
+  const [selectedRecentNote, setSelectedRecentNote] = useState(null);
+
+  const recentNotes = useMemo(
+    () => Array.from({ length: 4 }).map((_, idx) => ({
+      id: `detail-recent-${idx + 1}`,
+      label: 'https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation'
+    })),
+    []
+  );
+
+  const handleSelectView = (view) => {
+    setSelectedSidebarItem(view);
+    setSelectedRecentNote(null);
+    if (view === 'home') {
+      onBack();
+    }
+  };
+
   return (
     <div className="min-h-screen flex" style={{ backgroundColor: '#f8fafc' }}>
-      {/* Left Sidebar */}
-      <div className="w-64 flex flex-col" style={{ backgroundColor: '#ffffff', borderRight: '1px solid #e2e8f0' }}>
-        {/* Sidebar Header */}
-        <div className="px-6 flex items-center" style={{ borderBottom: '1px solid #e2e8f0', height: '56px' }}>
-          <div className="flex items-center space-x-3">
-            <div 
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
-              style={{ 
-                backgroundColor: '#372804',
-                color: '#FFF097'
-              }}
-            >
-              N
-            </div>
-            <span className="text-lg font-semibold" style={{ color: '#1e293b' }}>
-              NOA
-            </span>
-          </div>
-        </div>
+      <Sidebar
+        currentView={selectedSidebarItem}
+        onSelectView={handleSelectView}
+        recentNotes={recentNotes}
+        selectedRecentNote={selectedRecentNote}
+        onSelectRecentNote={setSelectedRecentNote}
+      />
 
-        {/* Navigation */}
-        <div className="flex-1 p-4">
-          <div className="mb-6">
-            <div className="mb-3">
-              <h3 className="text-sm font-medium" style={{ color: '#1e293b' }}>
-                Navigation
-              </h3>
-            </div>
-            
-            <div className="space-y-1">
-              {/* Home Option */}
-              <button
-                onClick={() => {
-                  setSelectedSidebarItem('home');
-                  onBack();
-                }}
-                className="w-full flex items-center space-x-3 px-3 rounded-lg text-left transition-colors"
-                style={{
-                  backgroundColor: selectedSidebarItem === 'home' ? '#f8fafc' : 'transparent',
-                  height: '40px'
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedSidebarItem !== 'home') {
-                    e.target.style.backgroundColor = '#f8fafc';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedSidebarItem !== 'home') {
-                    e.target.style.backgroundColor = 'transparent';
-                  }
-                }}
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 256 256"
-                  xmlns="http://www.w3.org/2000/svg"
-                  style={{
-                    color: selectedSidebarItem === 'home' ? '#372804' : '#64748b',
-                    transition: 'color 0.2s ease'
-                  }}
-                >
-                  <rect width="256" height="256" fill="none" />
-                  <path
-                    d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z"
-                    opacity="0.2"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="16"
-                  />
-                </svg>
-                <div>
-                  <div className="text-sm font-medium" style={{ color: selectedSidebarItem === 'home' ? '#1e293b' : '#64748b' }}>
-                    Home
-                  </div>
-                </div>
-              </button>
-
-              {/* Folders Option */}
-              <button
-                onClick={() => setSelectedSidebarItem('folders')}
-                className="w-full flex items-center space-x-3 px-3 rounded-lg text-left transition-colors"
-                style={{
-                  backgroundColor: selectedSidebarItem === 'folders' ? '#f8fafc' : 'transparent',
-                  height: '40px'
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedSidebarItem !== 'folders') {
-                    e.target.style.backgroundColor = '#f8fafc';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedSidebarItem !== 'folders') {
-                    e.target.style.backgroundColor = 'transparent';
-                  }
-                }}
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 256 256"
-                  xmlns="http://www.w3.org/2000/svg"
-                  style={{ color: selectedSidebarItem === 'folders' ? '#372804' : '#64748b' }}
-                >
-                  <rect width="256" height="256" fill="none" />
-                  <path
-                    d="M98.34,50.34,128,80H32V56a8,8,0,0,1,8-8H92.69A8,8,0,0,1,98.34,50.34Z"
-                    opacity="0.2"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M216.89,208H39.38A7.4,7.4,0,0,1,32,200.62V80H216a8,8,0,0,1,8,8V200.89A7.11,7.11,0,0,1,216.89,208Z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="16"
-                  />
-                  <path
-                    d="M32,80V56a8,8,0,0,1,8-8H92.69a8,8,0,0,1,5.65,2.34L128,80"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="16"
-                  />
-                </svg>
-                <div>
-                  <div className="text-sm font-medium" style={{ color: selectedSidebarItem === 'folders' ? '#1e293b' : '#64748b' }}>
-                    Folders
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <button 
-            className="w-full flex items-center space-x-2 px-3 py-2 text-sm rounded-lg transition-colors"
-            style={{ color: '#64748b', backgroundColor: '#f1f5f9' }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#e2e8f0'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#f1f5f9'}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add New Folder</span>
-          </button>
-
-          {/* Divider */}
-          <div className="my-4" style={{ borderTop: '1px solid #e2e8f0' }}></div>
-
-          {/* Recent Notes Section */}
-          <div className="mb-3">
-            <h3 className="text-sm font-medium" style={{ color: '#1e293b' }}>
-              RECENT NOTES
-            </h3>
-          </div>
-          <div className="space-y-1">
-            {/* Active Note - Tesla Motors */}
-            <div
-              className="flex items-center space-x-3 rounded-lg cursor-pointer transition-colors"
-              style={{ 
-                backgroundColor: '#f1f5f9',
-                height: '36px',
-                padding: '4px 8px'
-              }}
-            >
-              <i className="ri-sticky-note-line text-lg flex-shrink-0" style={{ color: '#372804' }}></i>
-              <div className="text-sm font-medium truncate flex-1" style={{ color: '#1e293b' }}>
-                Tesla Motors
-              </div>
-            </div>
-
-            {/* Second Note */}
-            <button
-              onClick={() => {
-                setSelectedSidebarItem('home');
-                onBack();
-              }}
-              className="w-full flex items-center space-x-3 rounded-lg cursor-pointer transition-colors text-left"
-              style={{ 
-                backgroundColor: 'transparent',
-                height: '36px',
-                padding: '4px 8px'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f1f5f9';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              <i className="ri-sticky-note-line text-lg flex-shrink-0" style={{ color: '#64748b' }}></i>
-              <div className="text-sm font-medium truncate flex-1" style={{ color: '#1e293b' }}>
-                Tesla Motors
-              </div>
-            </button>
-          </div>
-        </div>
-
-        {/* Sidebar Footer */}
-        <div className="p-4" style={{ borderTop: '1px solid #e2e8f0' }}>
-          <button 
-            className="w-full flex items-center space-x-2 px-3 py-2 text-sm rounded-lg transition-colors"
-            style={{ color: '#64748b' }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-          >
-            <Settings className="h-4 w-4" />
-            <span>Settings</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-0 relative">
         {/* Header - Same as Dashboard */}
         <header className="px-6 relative z-10 flex items-center" style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', height: '56px' }}>
@@ -241,7 +48,7 @@ const NoteDetail = ({ onBack, onLogout }) => {
 
             <div className="flex items-center space-x-4">
               {/* Notifications */}
-              <button 
+              <button
                 className="p-1.5 rounded-lg transition-colors relative"
                 style={{ color: '#64748b' }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'}
@@ -255,11 +62,11 @@ const NoteDetail = ({ onBack, onLogout }) => {
               <button
                 onClick={() => {
                   console.log('🔓 Sign Out clicked!')
-                  
+
                   // Clear user data immediately
                   localStorage.removeItem('noa-user')
                   console.log('🗑️ User data cleared from localStorage')
-                  
+
                   // Call onLogout if available, otherwise force redirect
                   if (onLogout && typeof onLogout === 'function') {
                     console.log('✅ Calling onLogout function...')
@@ -304,7 +111,7 @@ const NoteDetail = ({ onBack, onLogout }) => {
             >
               <Home className="h-5 w-5" />
             </button>
-            
+
             {/* Heading Group */}
             <div className="mb-8">
               <h1 className="font-bold" style={{ fontSize: '20px', color: '#1e293b', marginBottom: '4px' }}>
@@ -314,9 +121,9 @@ const NoteDetail = ({ onBack, onLogout }) => {
                 Notes from tesla.com - Track updates, insights, and discussions about Tesla Motors innovations and developments.
               </p>
             </div>
-            
+
             {/* Note Card */}
-            <NoteInDetail 
+            <NoteInDetail
               date="August 29, 2025 15:55"
               siteName="Tesla Motors"
               noteCount={4}
