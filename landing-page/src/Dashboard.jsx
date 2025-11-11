@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { 
   Search,
   Bell,
@@ -66,11 +66,13 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   //   return saved ? JSON.parse(saved) : workspaces[0]
   // })
   const [selectedRecentNote, setSelectedRecentNote] = useState(null)
+  const [highlightedNoteId, setHighlightedNoteId] = useState(null)
   const [selectedPage, setSelectedPage] = useState(null)
   const [folderDropdownOpen, setFolderDropdownOpen] = useState(false)
   const [pagesDropdownOpen, setPagesDropdownOpen] = useState(false)
   const folderDropdownRef = useRef(null)
   const pagesDropdownRef = useRef(null)
+  const noteRefs = useRef({})
 
   const sidebarRecentNotes = useMemo(
     () => Array.from({ length: 4 }).map((_, idx) => ({
@@ -85,6 +87,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
     setSelectedFolder(null)
     setSelectedPage(null)
     setSelectedRecentNote(null)
+    setHighlightedNoteId(null)
     setFolderDropdownOpen(false)
     setPagesDropdownOpen(false)
     if (view === 'folders' && folders.length > 0) {
@@ -113,6 +116,28 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
 
   const searchRef = useRef(null)
   const workspacePopupRef = useRef(null)
+
+  const handleRecentNoteSelect = useCallback((note) => {
+    if (!note) return
+    setCurrentView('home')
+    setSelectedFolder(null)
+    setSelectedPage(null)
+    setSelectedRecentNote(note.id)
+    setHighlightedNoteId(note.id)
+    setFolderDropdownOpen(false)
+    setPagesDropdownOpen(false)
+    setSitesPage(1)
+  }, [])
+
+  useEffect(() => {
+    if (currentView !== 'home' || !highlightedNoteId) {
+      return
+    }
+    const node = noteRefs.current[highlightedNoteId]
+    if (node) {
+      node.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [currentView, highlightedNoteId])
 
   // Handle click outside search and workspace popup
   useEffect(() => {
@@ -1250,7 +1275,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
         onAddFolder={() => setShowWorkspacePopup(true)}
         recentNotes={sidebarRecentNotes}
         selectedRecentNote={selectedRecentNote}
-        onSelectRecentNote={setSelectedRecentNote}
+        onSelectRecentNote={handleRecentNoteSelect}
       />
 
       {/* Main Content */}
@@ -1835,12 +1860,41 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
             )}
 
             <div className="flex flex-col" style={{ rowGap: '24px' }}>
-              {[0, 1, 2, 3].map((index) => (
-                <NoteComponent 
-                  key={index}
-                  isExpanded={isExpanded}
-                />
-              ))}
+              {sidebarRecentNotes.map((note) => {
+                const isHighlighted = currentView === 'home' && highlightedNoteId === note.id
+                const wrapperStyle = {
+                  padding: '6px',
+                  borderRadius: '14px',
+                  transition: 'background 0.3s ease, box-shadow 0.3s ease',
+                  border: '1px solid transparent',
+                  ...(isHighlighted
+                    ? {
+                        background: 'linear-gradient(90deg, rgba(22, 163, 74, 0.2) 0%, rgba(255, 255, 255, 1) 100%)',
+                        border: '1px solid #E5E7EB',
+                        boxShadow:
+                          '0 1px 3px rgba(0, 0, 0, 0.05), inset 0 0 8px rgba(22, 163, 74, 0.25)'
+                      }
+                    : {})
+                }
+                return (
+                  <div
+                    key={note.id}
+                    data-note-id={note.id}
+                    ref={(el) => {
+                      if (el) {
+                        noteRefs.current[note.id] = el
+                      } else {
+                        delete noteRefs.current[note.id]
+                      }
+                    }}
+                    style={wrapperStyle}
+                  >
+                    <NoteComponent 
+                      isExpanded={isExpanded}
+                    />
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>

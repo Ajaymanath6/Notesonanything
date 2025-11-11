@@ -15,7 +15,7 @@ const Sidebar = ({
       return (
         <button
           key={note.id}
-          onClick={() => onSelectRecentNote(note.id)}
+          onClick={() => onSelectRecentNote?.(note)}
           className="w-full flex items-center space-x-3 rounded-lg cursor-pointer transition-colors text-left"
           style={{
             backgroundColor: isSelected ? '#efefef' : 'transparent',
