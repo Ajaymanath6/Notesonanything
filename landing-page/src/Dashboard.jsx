@@ -1771,23 +1771,15 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: '#efefef', color: '#372804' }}
                 >
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 256 256"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
+                  <svg width="22" height="22" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
                     <rect width="256" height="256" fill="none" />
-                    <path
-                      d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                      opacity="0.2"
-                      fill="currentColor"
-                    />
-                    <line
-                      x1="96"
-                      y1="128"
-                      x2="160"
-                      y2="128"
+                    <path d="M32,96H224V56a8,8,0,0,0-8-8H40a8,8,0,0,0-8,8Z" opacity="0.2" fill="currentColor" />
+                    <rect
+                      x="32"
+                      y="48"
+                      width="192"
+                      height="160"
+                      rx="8"
                       fill="none"
                       stroke="currentColor"
                       strokeLinecap="round"
@@ -1795,51 +1787,10 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                       strokeWidth="16"
                     />
                     <line
-                      x1="96"
-                      y1="160"
-                      x2="160"
-                      y2="160"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="16"
-                    />
-                    <path
-                      d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="16"
-                    />
-                    <line
-                      x1="80"
-                      y1="24"
-                      x2="80"
-                      y2="56"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="16"
-                    />
-                    <line
-                      x1="128"
-                      y1="24"
-                      x2="128"
-                      y2="56"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="16"
-                    />
-                    <line
-                      x1="176"
-                      y1="24"
-                      x2="176"
-                      y2="56"
+                      x1="32"
+                      y1="96"
+                      x2="224"
+                      y2="96"
                       fill="none"
                       stroke="currentColor"
                       strokeLinecap="round"
