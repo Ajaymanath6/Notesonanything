@@ -386,7 +386,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
       website: 'notion.so',
       websiteName: 'Notion Workspace'
     },
-    // Linear Issues - 1 note
+    // UniCourt Documentation - 1 note
     {
       id: 7,
       type: 'gray',
@@ -395,8 +395,9 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
       timestamp: '1 day ago',
       comments: 1,
       likes: 2,
-      website: 'linear.app',
-      websiteName: 'Linear Issues',
+      website: 'dart.unicourt.com',
+      websiteName: 'Documentation Overview',
+      pageUrl: 'https://dart.unicourt.com/......../....../documentation',
       commentsList: [
         {
           id: 701,
@@ -620,6 +621,67 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
       likes: 0,
       website: 'test.com',
       websiteName: 'Test Workspace'
+    },
+    // Demo Pages - random company samples
+    {
+      id: 20,
+      type: 'gray',
+      content: 'Realtime metrics for partner integrations have been refreshed. Monitor the new anomaly alerts on the Signals Console.',
+      author: 'You',
+      timestamp: '3 hours ago',
+      comments: 1,
+      likes: 2,
+      website: 'aurorasync.io',
+      websiteName: 'Signals Console',
+      pageUrl: 'https://aurorasync.io/platform/realtime/signals-overview'
+    },
+    {
+      id: 21,
+      type: 'gray',
+      content: 'Incident follow-up: Documented the full outage timeline with remediation steps for the on-call handbook.',
+      author: 'You',
+      timestamp: '6 hours ago',
+      comments: 2,
+      likes: 1,
+      website: 'pulsegrid.dev',
+      websiteName: 'Incident Timeline',
+      pageUrl: 'https://pulsegrid.dev/ops/incidents/postmortems/incident-timeline'
+    },
+    {
+      id: 22,
+      type: 'gray',
+      content: 'Customer journey experiments are live. Review the conversion insights for the latest onboarding cohort.',
+      author: 'You',
+      timestamp: '1 day ago',
+      comments: 1,
+      likes: 3,
+      website: 'everpath.app',
+      websiteName: 'Customer Journeys',
+      pageUrl: 'https://everpath.app/team/customer-experience/journeys-overview'
+    },
+    {
+      id: 23,
+      type: 'gray',
+      content: 'Automation rule set beta: Validate the new workflow triggers for staged rollouts before Tuesday.',
+      author: 'You',
+      timestamp: '12 hours ago',
+      comments: 0,
+      likes: 2,
+      website: 'novaops.cloud',
+      websiteName: 'Automation Rules',
+      pageUrl: 'https://novaops.cloud/console/automation/ruleset-builder'
+    },
+    {
+      id: 24,
+      type: 'gray',
+      content: 'Research playbooks have been reorganized. Cross-team collaborations are now tracked in this hub.',
+      author: 'You',
+      timestamp: '2 days ago',
+      comments: 2,
+      likes: 4,
+      website: 'quantumscroll.ai',
+      websiteName: 'Research Playbooks',
+      pageUrl: 'https://quantumscroll.ai/labs/research/research-playbooks'
     }
   ]
 
@@ -664,19 +726,29 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   
   const notes = getFilteredNotes()
 
+  const spotlightHosts = [
+    'dart.unicourt.com',
+    'aurorasync.io',
+    'pulsegrid.dev',
+    'everpath.app',
+    'novaops.cloud',
+    'quantumscroll.ai'
+  ]
+
   const uniquePages = useMemo(() => {
     const sourceNotes = userNotes.length > 0 ? userNotes : mockNotes
-
+ 
     const seen = new Set()
     const entries = []
-
+    const spotlightSet = new Set(spotlightHosts)
+ 
     const extractMetadata = (note) => {
       const rawUrl = note.pageUrl || note.siteUrl || note.website || ''
       let normalizedUrl = rawUrl
       let hostname = ''
       let pageName = note.websiteName || note.siteName || ''
       const fallbackKey = note.website || note.websiteName || note.siteName || rawUrl || 'unknown'
-      let pathLabel = ''
+      let displayPath = ''
 
       if (rawUrl) {
         try {
@@ -686,10 +758,10 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
           const segments = parsed.pathname.split('/').filter(Boolean)
           if (segments.length) {
             pageName = decodeURIComponent(segments[segments.length - 1]).replace(/[-_]+/g, ' ')
-            pathLabel = segments.slice(0, segments.length - 1).join('/')
+            displayPath = segments.join('/')
           } else {
             pageName = hostname
-            pathLabel = ''
+            displayPath = ''
           }
         } catch (error) {
           pageName = pageName || rawUrl
@@ -702,10 +774,28 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
 
       const formattedName = pageName.replace(/\b\w/g, (char) => char.toUpperCase())
       const displayTitle = hostname
-        ? pathLabel
-          ? `${hostname} / ${formattedName}`
-          : `${hostname} / ${formattedName}`
+        ? (() => {
+            const normalizedName = formattedName.toLowerCase()
+            const normalizedHost = hostname.toLowerCase()
+            if (
+              normalizedName === normalizedHost ||
+              normalizedName.replace(/\s+/g, '') === normalizedHost.replace(/\s+/g, '') ||
+              spotlightSet.has(hostname)
+            ) {
+              return hostname
+            }
+            return `${hostname} / ${formattedName}`
+          })()
         : formattedName
+
+      const truncatedPath = (() => {
+        if (!displayPath) return ''
+        return displayPath
+          .split('/')
+          .filter(Boolean)
+          .map(segment => decodeURIComponent(segment))
+          .join('/')
+      })()
 
       return {
         key: fallbackKey,
@@ -713,7 +803,8 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
         pageName: formattedName,
         displayUrl: normalizedUrl || rawUrl,
         hostname: hostname || note.website || 'unknown',
-        displayTitle
+        displayTitle,
+        truncatedPath
       }
     }
 
@@ -730,7 +821,17 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
       entries.push(metadata)
     })
 
-    return entries
+    const spotlightEntries = entries.filter((entry) => spotlightSet.has(entry.hostname))
+    const entryByHost = new Map()
+    spotlightEntries.forEach((entry) => {
+      if (!entryByHost.has(entry.hostname)) {
+        entryByHost.set(entry.hostname, entry)
+      }
+    })
+
+    return spotlightHosts
+      .map((host) => entryByHost.get(host))
+      .filter(Boolean)
   }, [userNotes])
 
   // Group notes by website
@@ -919,7 +1020,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                 {selectedWebsite.website === 'figma.com' && <i className="ri-palette-line text-lg" style={{ color: '#f24e1e' }}></i>}
                 {selectedWebsite.website === 'github.com' && <i className="ri-github-line text-lg" style={{ color: '#24292e' }}></i>}
                 {selectedWebsite.website === 'notion.so' && <i className="ri-file-text-line text-lg" style={{ color: '#000000' }}></i>}
-                {selectedWebsite.website === 'linear.app' && <i className="ri-bug-line text-lg" style={{ color: '#5e6ad2' }}></i>}
+                {selectedWebsite.website === 'dart.unicourt.com' && <i className="ri-bug-line text-lg" style={{ color: '#5e6ad2' }}></i>}
                 <h3 className="font-semibold" style={{ color: '#1e293b' }}>
                   {selectedWebsite.websiteNotes[0]?.websiteName || selectedWebsite.website}
                 </h3>
@@ -1104,8 +1205,8 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                       {selectedWebsite.website === 'figma.com' && <i className="ri-palette-line text-lg" style={{ color: '#f24e1e' }}></i>}
                       {selectedWebsite.website === 'github.com' && <i className="ri-github-line text-lg" style={{ color: '#24292e' }}></i>}
                       {selectedWebsite.website === 'notion.so' && <i className="ri-file-text-line text-lg" style={{ color: '#000000' }}></i>}
-                      {selectedWebsite.website === 'linear.app' && <i className="ri-bug-line text-lg" style={{ color: '#5e6ad2' }}></i>}
-                      {!['figma.com', 'github.com', 'notion.so', 'linear.app'].includes(selectedWebsite.website) && <i className="ri-global-line text-lg" style={{ color: '#64748b' }}></i>}
+                      {selectedWebsite.website === 'dart.unicourt.com' && <i className="ri-bug-line text-lg" style={{ color: '#5e6ad2' }}></i>}
+                      {!['figma.com', 'github.com', 'notion.so', 'dart.unicourt.com'].includes(selectedWebsite.website) && <i className="ri-global-line text-lg" style={{ color: '#64748b' }}></i>}
                       <h4 className="text-base font-semibold" style={{ color: '#1e293b' }}>
                         {note.websiteName || selectedWebsite.website || 'NOA Workspace'}
                       </h4>
@@ -1179,15 +1280,48 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                       : currentView.charAt(0).toUpperCase() + currentView.slice(1)
                 }
               </h1>
-              <p style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.2', margin: '0' }}>
-                {currentView === 'home' 
-                  ? 'Organize, collaborate, and manage your notes efficiently'
-                  : currentView === 'pages' && selectedPage
-                    ? `Viewing every note captured on ${selectedPage.displayUrl}`
-                  : selectedFolder
-                    ? selectedFolder.description
-                      : 'Browse and organize your notebooks'
-                }
+              <p
+                style={{
+                  fontSize: '13px',
+                  color: '#64748b',
+                  lineHeight: '1.2',
+                  margin: '0',
+                  fontWeight: currentView === 'pages' && selectedPage ? 600 : 400
+                }}
+              >
+                {(() => {
+                  if (currentView === 'home') {
+                    return 'Organize, collaborate, and manage your notes efficiently'
+                  }
+                  if (currentView === 'pages' && selectedPage) {
+                    const label = `Viewing every note captured on ${selectedPage.displayUrl}`
+                    try {
+                      const url = new URL(selectedPage.displayUrl)
+                      const segments = url.pathname.split('/').filter(Boolean)
+                      const lastSegment = segments.pop()
+                      if (!lastSegment) {
+                        return label
+                      }
+                      const lastIndex = label.lastIndexOf(lastSegment)
+                      if (lastIndex === -1) {
+                        return label
+                      }
+                      return (
+                        <>
+                          {label.substring(0, lastIndex)}
+                          <span style={{ fontWeight: 600 }}>{lastSegment}</span>
+                          {label.substring(lastIndex + lastSegment.length)}
+                        </>
+                      )
+                    } catch {
+                      return label
+                    }
+                  }
+                  if (selectedFolder) {
+                    return selectedFolder.description
+                  }
+                  return 'Browse and organize your notebooks'
+                })()}
               </p>
             </div>
 
@@ -1533,7 +1667,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                         )}
                         {isPages && pagesDropdownOpen && (
                           <div
-                            className="absolute left-0 top-full mt-2 w-72 rounded-xl border text-sm font-medium overflow-hidden"
+                            className="absolute left-0 top-full mt-2 w-96 rounded-xl border text-sm font-medium overflow-hidden"
                             style={{
                               backgroundColor: '#ffffff',
                               borderColor: '#e2e8f0',
@@ -1575,20 +1709,38 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                                     </div>
                                     <div className="flex flex-col gap-1">
                                       <span className="font-medium" style={{ color: '#1e293b' }}>
-                                        {page.displayTitle}
+                                        {page.hostname}
                                       </span>
-                                      <span className="flex items-center gap-2 text-xs" style={{ color: '#64748b', maxWidth: '240px' }}>
-                                        <i className="ri-link text-xs"></i>
-                                        <span className="truncate" style={{ maxWidth: '220px' }}>
-                                          {page.displayUrl.replace(/^https?:\/\//, '')}
+                                      <span className="flex items-center gap-2 text-xs" style={{ color: '#1f2937', maxWidth: '280px' }}>
+                                        <span className="truncate" style={{ maxWidth: '260px' }}>
+                                          <span>{page.hostname}</span>
+                                          {page.truncatedPath && (() => {
+                                            const pathSegments = page.truncatedPath.split('/').filter(Boolean)
+                                            const lastSegment = pathSegments.pop()
+                                            if (!lastSegment) {
+                                              return null
+                                            }
+                                            const leadingPath = pathSegments.length > 0 ? `/${pathSegments.join('/')}/` : '/'
+                                            return (
+                                              <span>
+                                                <span aria-hidden="true">...</span>
+                                                <span>
+                                                  {leadingPath}
+                                                  <span style={{ color: '#16a34a' }}>{lastSegment}</span>
+                                                </span>
+                                              </span>
+                                            )
+                                          })()}
                                         </span>
                                       </span>
                                       <span className="text-xs" style={{ color: '#94a3b8' }}>
-                                        See all notes on this page in {page.hostname.replace(/^www\./, '')}
+                                        See all notes on this page
+                                        {page.hostname && page.hostname !== 'dart.unicourt.com'
+                                          ? ` in ${page.hostname.replace(/^www\./, '')}`
+                                          : ''}
                                       </span>
                                     </div>
                                   </div>
-                                  <i className="ri-arrow-right-up-line text-xs" style={{ color: '#64748b' }}></i>
                                 </button>
                               ))
                             )}
