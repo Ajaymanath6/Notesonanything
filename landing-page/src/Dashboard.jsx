@@ -1286,7 +1286,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   color: '#64748b',
                   lineHeight: '1.2',
                   margin: '0',
-                  fontWeight: currentView === 'pages' && selectedPage ? 600 : 400
+                  fontWeight: currentView === 'pages' && selectedPage ? 500 : 400
                 }}
               >
                 {(() => {
@@ -1294,28 +1294,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                     return 'Organize, collaborate, and manage your notes efficiently'
                   }
                   if (currentView === 'pages' && selectedPage) {
-                    const label = `Viewing every note captured on ${selectedPage.displayUrl}`
-                    try {
-                      const url = new URL(selectedPage.displayUrl)
-                      const segments = url.pathname.split('/').filter(Boolean)
-                      const lastSegment = segments.pop()
-                      if (!lastSegment) {
-                        return label
-                      }
-                      const lastIndex = label.lastIndexOf(lastSegment)
-                      if (lastIndex === -1) {
-                        return label
-                      }
-                      return (
-                        <>
-                          {label.substring(0, lastIndex)}
-                          <span>{lastSegment}</span>
-                          {label.substring(lastIndex + lastSegment.length)}
-                        </>
-                      )
-                    } catch {
-                      return label
-                    }
+                    return 'Review the notes saved for this page below'
                   }
                   if (selectedFolder) {
                     return selectedFolder.description
@@ -1701,8 +1680,8 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                                       <span className="font-medium" style={{ color: '#1e293b' }}>
                                         {page.hostname}
                                       </span>
-                                      <span className="flex items-center gap-2 text-xs" style={{ color: '#1f2937', maxWidth: '280px' }}>
-                                        <span className="truncate" style={{ maxWidth: '260px' }}>
+                                      <span className="flex items-center gap-2 text-xs" style={{ color: '#1f2937', maxWidth: '100%' }}>
+                                        <span style={{ wordBreak: 'break-all' }}>
                                           <span>{page.hostname}</span>
                                           {page.truncatedPath && (() => {
                                             const pathSegments = page.truncatedPath.split('/').filter(Boolean)
@@ -1786,6 +1765,124 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
             </div>
 
             {/* Note Cards */}
+            {currentView === 'pages' && selectedPage && (
+              <div className="mb-6 flex items-start gap-3">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: '#efefef', color: '#372804' }}
+                >
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 256 256"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect width="256" height="256" fill="none" />
+                    <path
+                      d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+                      opacity="0.2"
+                      fill="currentColor"
+                    />
+                    <line
+                      x1="96"
+                      y1="128"
+                      x2="160"
+                      y2="128"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="16"
+                    />
+                    <line
+                      x1="96"
+                      y1="160"
+                      x2="160"
+                      y2="160"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="16"
+                    />
+                    <path
+                      d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="16"
+                    />
+                    <line
+                      x1="80"
+                      y1="24"
+                      x2="80"
+                      y2="56"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="16"
+                    />
+                    <line
+                      x1="128"
+                      y1="24"
+                      x2="128"
+                      y2="56"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="16"
+                    />
+                    <line
+                      x1="176"
+                      y1="24"
+                      x2="176"
+                      y2="56"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="16"
+                    />
+                  </svg>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-semibold" style={{ color: '#1e293b' }}>
+                    {selectedPage.pageName || selectedPage.hostname}
+                  </span>
+                  <span className="text-xs" style={{ color: '#64748b' }}>
+                    Viewing every note captured on{' '}
+                    {(() => {
+                      const urlText = selectedPage.displayUrl || selectedPage.hostname
+                      try {
+                        const url = new URL(urlText)
+                        const segments = url.pathname.split('/').filter(Boolean)
+                        const lastSegment = segments.pop()
+                        if (!lastSegment) {
+                          return <span style={{ color: '#0f172a' }}>{urlText}</span>
+                        }
+                        const lastIndex = urlText.lastIndexOf(lastSegment)
+                        if (lastIndex === -1) {
+                          return <span style={{ color: '#0f172a' }}>{urlText}</span>
+                        }
+                        return (
+                          <span style={{ color: '#0f172a' }}>
+                            {urlText.substring(0, lastIndex)}
+                            <span style={{ color: '#16a34a', fontWeight: 600 }}>{lastSegment}</span>
+                            {urlText.substring(lastIndex + lastSegment.length)}
+                          </span>
+                        )
+                      } catch {
+                        return <span style={{ color: '#0f172a' }}>{urlText}</span>
+                      }
+                    })()}
+                  </span>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-col" style={{ rowGap: '24px' }}>
               {[0, 1, 2, 3].map((index) => (
                 <NoteComponent 

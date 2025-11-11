@@ -906,14 +906,34 @@ const NoteComponent = ({ onClick, isExpanded }) => {
       <div className="relative rounded-xl overflow-hidden" style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
         <div style={{ boxShadow: '0 18px 35px rgba(15, 23, 42, 0.08)', borderBottom: '1px solid rgba(15, 23, 42, 0.05)' }}>
           <header ref={headerRef} className="relative">
-            <a
-              href="https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation"
-              className="block px-5 py-2 text-xs font-medium truncate"
-              style={{ backgroundColor: 'rgba(239, 239, 239, 0.88)', color: '#1e293b', borderBottom: '1px solid #e2e8f0' }}
-              onClick={(event) => event.stopPropagation()}
+            <div
+              className="flex items-center gap-3 px-5 py-2"
+              style={{ backgroundColor: 'rgba(239, 239, 239, 0.88)', borderBottom: '1px solid #e2e8f0' }}
             >
-              https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation
-            </a>
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: '#efefef', color: '#372804' }}
+              >
+                <svg width="20" height="20" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="256" height="256" fill="none" />
+                  <path d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z" opacity="0.2" fill="currentColor" />
+                  <line x1="96" y1="128" x2="160" y2="128" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16" />
+                  <line x1="96" y1="160" x2="160" y2="160" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16" />
+                  <path d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16" />
+                  <line x1="80" y1="24" x2="80" y2="56" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16" />
+                  <line x1="128" y1="24" x2="128" y2="56" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16" />
+                  <line x1="176" y1="24" x2="176" y2="56" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16" />
+                </svg>
+              </div>
+              <a
+                href="https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation"
+                className="flex-1 text-xs font-medium truncate"
+                style={{ color: '#1e293b' }}
+                onClick={(event) => event.stopPropagation()}
+              >
+                https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation
+              </a>
+            </div>
             <div className="absolute inset-y-0 right-2 flex items-center gap-2">
               <div className="relative">
                 <button
