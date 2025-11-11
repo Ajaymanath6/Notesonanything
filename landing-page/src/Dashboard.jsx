@@ -1309,7 +1309,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                       return (
                         <>
                           {label.substring(0, lastIndex)}
-                          <span style={{ fontWeight: 600 }}>{lastSegment}</span>
+                          <span>{lastSegment}</span>
                           {label.substring(lastIndex + lastSegment.length)}
                         </>
                       )
@@ -1494,36 +1494,26 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></div>
               </button>
 
-              {/* Simple Sign Out Button */}
+              {/* Premium Upsell Button */}
               <button
-                onClick={() => {
-                  console.log('🔓 Sign Out clicked!')
-                  
-                  // Clear user data immediately
-                  localStorage.removeItem('noa-user')
-                  console.log('🗑️ User data cleared from localStorage')
-                  
-                  // Call onLogout if available, otherwise force redirect
-                  if (onLogout && typeof onLogout === 'function') {
-                    console.log('✅ Calling onLogout function...')
-                    onLogout()
-                  } else {
-                    console.log('🔄 No onLogout function - forcing redirect')
-                    window.location.href = '/'
-                  }
-                }}
-                className="flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all duration-200 text-xs font-medium"
+                onClick={() => console.log('✨ Upgrade flow coming soon')}
+                className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
                 style={{
-                  backgroundColor: '#ef4444',
-                  color: '#ffffff',
-                  border: 'none'
+                  backgroundColor: '#ffffff',
+                  color: '#1e293b',
+                  border: '2px solid #e2e8f0',
+                  boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
-                title="Sign out and return to landing page"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ffffff'
+                }}
+                title="Upgrade to unlock unlimited notes"
               >
-                <LogOut className="h-3.5 w-3.5" />
-                <span>Sign Out</span>
+                <i className="ri-infinity-line text-base" style={{ color: '#0ea5e9' }}></i>
+                <span>Get Unlimited Notes</span>
               </button>
             </div>
           </div>
