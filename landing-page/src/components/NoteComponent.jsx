@@ -56,6 +56,43 @@ const NOTION_TEMPLATES = [
 const NOTION_STATUS_OPTIONS = ['Backlog', 'In Progress', 'Review', 'Published']
 const NOTION_TAGS = ['Engineering', 'Design', 'Product', 'Bug', 'Research']
 
+// Helper function to format URL for display
+const formatUrlForDisplay = (urlString) => {
+  try {
+    const url = new URL(urlString)
+    const pathSegments = url.pathname.split('/').filter(Boolean)
+    if (pathSegments.length === 0) {
+      return urlString
+    }
+    // If there are more than 2 segments, show all except last two, then ..., then last
+    if (pathSegments.length > 2) {
+      const segmentsToShow = pathSegments.slice(0, -2)
+      const lastSegment = pathSegments[pathSegments.length - 1]
+      return `/${segmentsToShow.join('/')}/.../${lastSegment}`
+    }
+    // If 2 segments, show both
+    if (pathSegments.length === 2) {
+      return `/${pathSegments.join('/')}`
+    }
+    // If 1 segment, show it
+    return `/${pathSegments[0]}`
+  } catch {
+    // If URL parsing fails, try to extract path manually
+    const match = urlString.match(/\/[^\/]+(?:\/[^\/]+)*\/?$/)
+    if (match) {
+      const path = match[0]
+      const segments = path.split('/').filter(Boolean)
+      if (segments.length > 2) {
+        const segmentsToShow = segments.slice(0, -2)
+        const lastSegment = segments[segments.length - 1]
+        return `/${segmentsToShow.join('/')}/.../${lastSegment}`
+      }
+      return path
+    }
+    return urlString
+  }
+}
+
 const NoteComponent = ({ onClick, isExpanded }) => {
   const pageContext = {
     siteName: 'Tesla Motors',
@@ -107,6 +144,12 @@ const NoteComponent = ({ onClick, isExpanded }) => {
   const [optionsOpen, setOptionsOpen] = useState(false)
   const [activeIntegration, setActiveIntegration] = useState(null)
   const [integrationMenuPosition, setIntegrationMenuPosition] = useState(null)
+  const [shareMenuOpen, setShareMenuOpen] = useState(false)
+  const [shareMenuPosition, setShareMenuPosition] = useState(null)
+  const [shareEmails, setShareEmails] = useState('')
+  const jiraButtonRef = useRef(null)
+  const notionButtonRef = useRef(null)
+  const shareButtonRef = useRef(null)
 
   // Jira integration state
   const [selectedProject, setSelectedProject] = useState(null)
@@ -200,6 +243,30 @@ const NoteComponent = ({ onClick, isExpanded }) => {
     resetNotionState()
   }, [resetJiraState, resetNotionState])
 
+  const closeShareMenu = useCallback(() => {
+    setShareMenuOpen(false)
+    setShareMenuPosition(null)
+    setShareEmails('')
+  }, [])
+
+  const handleShareButtonClick = useCallback(
+    (rect) => {
+      if (shareMenuOpen) {
+        closeShareMenu()
+        return
+      }
+      closeAllDropdowns()
+      closeIntegrationMenu()
+      setShareMenuPosition({
+        top: rect.bottom + 8,
+        left: rect.left
+      })
+      setShareMenuOpen(true)
+      setOptionsOpen(false)
+    },
+    [shareMenuOpen, closeAllDropdowns, closeIntegrationMenu, closeShareMenu]
+  )
+
   const handleIntegrationButtonClick = useCallback(
     (integration, rect) => {
       if (activeIntegration === integration) {
@@ -214,7 +281,7 @@ const NoteComponent = ({ onClick, isExpanded }) => {
       }
       setIntegrationMenuPosition({
         top: rect.bottom + 8,
-        left: rect.right
+        left: rect.left
       })
       setActiveIntegration(integration)
       setOptionsOpen(false)
@@ -223,20 +290,22 @@ const NoteComponent = ({ onClick, isExpanded }) => {
   )
 
   useEffect(() => {
-    if (!optionsOpen && !activeIntegration) return
+    if (!optionsOpen && !activeIntegration && !shareMenuOpen) return
 
     const handleClickAway = (event) => {
       const isInsideHeader = headerRef.current?.contains(event.target)
       const isInsideIntegrationMenu = event.target.closest('.note-integration-menu')
-      if (!isInsideHeader && !isInsideIntegrationMenu) {
+      const isInsideShareMenu = event.target.closest('.note-share-menu')
+      if (!isInsideHeader && !isInsideIntegrationMenu && !isInsideShareMenu) {
         setOptionsOpen(false)
         closeIntegrationMenu()
+        closeShareMenu()
       }
     }
 
     document.addEventListener('mousedown', handleClickAway)
     return () => document.removeEventListener('mousedown', handleClickAway)
-  }, [optionsOpen, activeIntegration, closeIntegrationMenu])
+  }, [optionsOpen, activeIntegration, shareMenuOpen, closeIntegrationMenu, closeShareMenu])
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -245,12 +314,55 @@ const NoteComponent = ({ onClick, isExpanded }) => {
         if (activeIntegration) {
           closeIntegrationMenu()
         }
+        if (shareMenuOpen) {
+          closeShareMenu()
+        }
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [activeIntegration, closeIntegrationMenu])
+  }, [activeIntegration, shareMenuOpen, closeIntegrationMenu, closeShareMenu])
+
+  // Update dropdown positions on scroll
+  useEffect(() => {
+    if (!activeIntegration && !shareMenuOpen) return
+
+    const updatePositions = () => {
+      if (activeIntegration === 'jira' && jiraButtonRef.current) {
+        const rect = jiraButtonRef.current.getBoundingClientRect()
+        setIntegrationMenuPosition({
+          top: rect.bottom + 8,
+          left: rect.left
+        })
+      } else if (activeIntegration === 'notion' && notionButtonRef.current) {
+        const rect = notionButtonRef.current.getBoundingClientRect()
+        setIntegrationMenuPosition({
+          top: rect.bottom + 8,
+          left: rect.left
+        })
+      }
+      
+      if (shareMenuOpen && shareButtonRef.current) {
+        const rect = shareButtonRef.current.getBoundingClientRect()
+        setShareMenuPosition({
+          top: rect.bottom + 8,
+          left: rect.left
+        })
+      }
+    }
+
+    // Update immediately
+    updatePositions()
+
+    window.addEventListener('scroll', updatePositions, true)
+    window.addEventListener('resize', updatePositions)
+    
+    return () => {
+      window.removeEventListener('scroll', updatePositions, true)
+      window.removeEventListener('resize', updatePositions)
+    }
+  }, [activeIntegration, shareMenuOpen])
 
   useEffect(() => {
     if (!selectedWorkspace) {
@@ -799,10 +911,10 @@ const NoteComponent = ({ onClick, isExpanded }) => {
         className="note-integration-menu w-[320px] rounded-2xl border bg-white px-4 py-4 text-xs shadow-2xl space-y-4"
         style={{
           position: 'fixed',
-          top: integrationMenuPosition.top,
-          left: integrationMenuPosition.left,
+          top: `${integrationMenuPosition.top}px`,
+          left: `${integrationMenuPosition.left}px`,
           transform: 'translateX(-100%)',
-          zIndex: 2000,
+          zIndex: 9999,
           borderColor: '#e2e8f0',
           boxShadow: '0 28px 54px rgba(15, 23, 42, 0.24)'
         }}
@@ -886,6 +998,171 @@ const NoteComponent = ({ onClick, isExpanded }) => {
     )
   }
 
+  const renderShareMenu = () => {
+    if (!shareMenuOpen || !shareMenuPosition) return null
+
+    const mockPeople = [
+      { name: 'M Madeline Bramham', avatar: 'M', role: 'owner', color: '#3b82f6' },
+      { name: 'Rolfi Sánchez', avatar: 'RS', role: 'can view', color: '#64748b' },
+      { name: 'Jenison Monteiro', avatar: 'JM', role: 'can view', color: '#64748b' },
+      { name: 'V vishwas', avatar: 'V', role: 'can view', color: '#a855f7' },
+      { name: 'V Vivek Texeira', avatar: 'V', role: 'can view', color: '#a855f7' },
+      { name: 'Prathyush Shetty', avatar: 'PS', role: 'can view', color: '#64748b' }
+    ]
+
+    return createPortal(
+      <div
+        className="note-share-menu fixed bg-white rounded-lg border shadow-xl"
+        style={{
+          top: `${shareMenuPosition.top}px`,
+          left: `${shareMenuPosition.left}px`,
+          transform: 'translateX(-100%)',
+          width: '400px',
+          maxHeight: '600px',
+          zIndex: 9999,
+          borderColor: '#e2e8f0',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+        }}
+      >
+        <div className="p-4 space-y-4">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold" style={{ color: '#1e293b' }}>
+              Share the note
+            </h3>
+            <div className="flex items-center gap-2">
+              <button
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                style={{
+                  color: '#64748b',
+                  border: '1px solid #e2e8f0',
+                  backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  navigator.clipboard?.writeText(window.location.href)
+                }}
+              >
+                <i className="ri-links-line text-sm"></i>
+                Copy link
+              </button>
+              <button
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: '#94a3b8' }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  closeShareMenu()
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+              >
+                <i className="ri-close-line text-lg"></i>
+              </button>
+            </div>
+          </div>
+
+          {/* Invite Section */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={shareEmails}
+                onChange={(e) => setShareEmails(e.target.value)}
+                placeholder="Add comma separated emails to invite"
+                className="flex-1 px-3 py-2 text-xs rounded-lg border focus:outline-none"
+                style={{
+                  borderColor: '#e2e8f0',
+                  color: '#1e293b',
+                  backgroundColor: '#ffffff'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#cbd5e1'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+              />
+              <button
+                className="px-4 py-2 text-xs font-medium rounded-lg transition-colors"
+                style={{
+                  backgroundColor: '#1e293b',
+                  color: '#ffffff'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#374151'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#1e293b'}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (shareEmails.trim()) {
+                    console.log('Inviting:', shareEmails)
+                    setShareEmails('')
+                  }
+                }}
+              >
+                Invite
+              </button>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button className="px-2 py-1 text-xs rounded border" style={{ borderColor: '#e2e8f0', color: '#64748b' }}>
+                + Kishor Yermal
+              </button>
+              <button className="px-2 py-1 text-xs rounded border" style={{ borderColor: '#e2e8f0', color: '#64748b' }}>
+                + andyj
+              </button>
+              <button className="px-2 py-1 text-xs rounded border" style={{ borderColor: '#e2e8f0', color: '#64748b' }}>
+                + Antonio Dharmadas
+              </button>
+            </div>
+          </div>
+
+          {/* Who has access */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#64748b' }}>
+              Who has access
+            </h4>
+            
+            {/* Global Access */}
+            <div className="flex items-center justify-between py-2">
+              <div className="flex items-center gap-2">
+                <i className="ri-global-line text-base" style={{ color: '#64748b' }}></i>
+                <span className="text-sm" style={{ color: '#1e293b' }}>Anyone</span>
+              </div>
+              <span className="text-xs" style={{ color: '#64748b' }}>can view</span>
+            </div>
+
+            {/* Project Access */}
+            <div className="flex items-center justify-between py-2">
+              <div className="flex items-center gap-2">
+                <i className="ri-folder-line text-base" style={{ color: '#64748b' }}></i>
+                <span className="text-sm" style={{ color: '#1e293b' }}>Anyone in Marketing Design</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs" style={{ color: '#64748b' }}>24 people</span>
+                <i className="ri-arrow-right-s-line text-sm" style={{ color: '#64748b' }}></i>
+              </div>
+            </div>
+
+            {/* People List */}
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {mockPeople.map((person, idx) => (
+                <div key={idx} className="flex items-center justify-between py-1.5">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white flex-shrink-0"
+                      style={{ backgroundColor: person.color }}
+                    >
+                      {person.avatar}
+                    </div>
+                    <span className="text-sm" style={{ color: '#1e293b' }}>{person.name}</span>
+                  </div>
+                  <span className="text-xs" style={{ color: '#64748b' }}>{person.role}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>,
+      document.body
+    )
+  }
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard?.writeText(note.bodyParagraphs.join('\n\n'))
@@ -925,18 +1202,38 @@ const NoteComponent = ({ onClick, isExpanded }) => {
                   <line x1="176" y1="24" x2="176" y2="56" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16" />
                 </svg>
               </div>
-              <a
-                href="https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation"
-                className="flex-1 text-xs font-medium truncate"
+            <a
+              href="https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation"
+                className="flex-1 text-xs font-medium truncate flex items-center gap-2"
                 style={{ color: '#1e293b' }}
-                onClick={(event) => event.stopPropagation()}
-              >
-                https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation
-              </a>
+              onClick={(event) => event.stopPropagation()}
+            >
+                <img 
+                  src={`${import.meta.env.BASE_URL || '/'}fav.svg`}
+                  alt="favicon" 
+                  width="16"
+                  height="16"
+                  className="flex-shrink-0"
+                  style={{ 
+                    display: 'block', 
+                    width: '16px', 
+                    height: '16px',
+                    objectFit: 'contain',
+                    verticalAlign: 'middle'
+                  }}
+                  onError={(e) => {
+                    // Fallback to remote favicon if local one fails
+                    e.target.src = 'https://cdn.unicourt.com/common_resources/images/favicon.ico'
+                    e.target.onerror = null
+                  }}
+                />
+                <span>{formatUrlForDisplay('https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation')}</span>
+            </a>
             </div>
             <div className="absolute inset-y-0 right-2 flex items-center gap-2">
               <div className="relative">
                 <button
+                  ref={jiraButtonRef}
                   className="flex items-center justify-center rounded-lg transition-all duration-200"
                   style={{
                     width: '28px',
@@ -962,13 +1259,11 @@ const NoteComponent = ({ onClick, isExpanded }) => {
                     <path fill="#1868DB" d="M7.967 21.323H5.748C2.401 21.323 0 19.273 0 16.271h11.933c.618 0 1.018.44 1.018 1.062V29.34c-2.983 0-4.984-2.416-4.984-5.784zm5.894-5.967h-2.22c-3.346 0-5.747-2.013-5.747-5.015h11.932c.618 0 1.055.402 1.055 1.025v12.007c-2.983 0-5.02-2.416-5.02-5.784zm5.93-5.93h-2.22c-3.347 0-5.748-2.05-5.748-5.052h11.933c.618 0 1.019.439 1.019 1.025v12.007c-2.983 0-4.984-2.416-4.984-5.784z"></path>
                   </svg>
                 </button>
-                {activeIntegration === 'jira' && (
-                  renderIntegrationMenu()
-                )}
               </div>
 
               <div className="relative">
                 <button
+                  ref={notionButtonRef}
                   className="flex items-center justify-center rounded-lg transition-all duration-200"
                   style={{
                     width: '28px',
@@ -995,9 +1290,35 @@ const NoteComponent = ({ onClick, isExpanded }) => {
                     <path fillRule="evenodd" clipRule="evenodd" d="M18.447.068L1.808 1.294C.468 1.41 0 2.285 0 3.334v18.198c0 .817.291 1.516.992 2.45l3.911 5.074c.643.817 1.226.992 2.453.934l19.321-1.167c1.634-.116 2.102-.875 2.102-2.158V6.192c0-.663-.263-.854-1.037-1.42l-.132-.096L22.3.943c-1.285-.932-1.81-1.05-3.854-.875zM7.793 5.857c-1.577.106-1.936.13-2.831-.597L2.685 3.452c-.233-.234-.116-.526.467-.584l15.995-1.166c1.342-.117 2.043.35 2.568.758l2.744 1.983c.117.059.408.408.058.408l-16.52.992-.203.014zM5.954 26.49V9.11c0-.759.234-1.109.934-1.168l18.971-1.108c.643-.058.935.35.935 1.108v17.264c0 .759-.117 1.401-1.168 1.459l-18.154 1.05c-1.05.058-1.518-.291-1.518-1.225zm17.922-16.448c.116.525 0 1.05-.527 1.11l-.874.173v12.832c-.76.408-1.46.641-2.044.641-.934 0-1.168-.292-1.868-1.166l-5.721-8.982v8.69l1.81.409s0 1.05-1.46 1.05l-4.027.233c-.117-.234 0-.817.408-.933l1.051-.291v-11.49L9.165 12.2c-.117-.525.174-1.283.992-1.341l4.32-.292 5.954 9.1v-8.05l-1.518-.174c-.116-.643.35-1.109.934-1.167l4.029-.234z" fill="#000"></path>
                   </svg>
                 </button>
-                {activeIntegration === 'notion' && (
-                  renderIntegrationMenu()
-                )}
+              </div>
+
+              <div className="relative">
+                <button
+                  ref={shareButtonRef}
+                  className="flex items-center justify-center rounded-lg transition-all duration-200"
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    border: '1px solid rgba(209, 213, 219, 0.6)',
+                    backgroundColor: shareMenuOpen ? '#ffffff' : 'transparent',
+                    color: '#94a3b8'
+                  }}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    const buttonRect = event.currentTarget.getBoundingClientRect()
+                    handleShareButtonClick(buttonRect)
+                  }}
+                  title="Share note"
+                  onMouseEnter={(event) => {
+                    if (!shareMenuOpen) event.currentTarget.style.backgroundColor = '#ffffff'
+                  }}
+                  onMouseLeave={(event) => {
+                    if (!shareMenuOpen) event.currentTarget.style.backgroundColor = 'transparent'
+                  }}
+                >
+                  <i className="ri-share-line text-sm" style={{ color: '#1e293b' }}></i>
+                </button>
               </div>
 
               <button
@@ -1021,7 +1342,7 @@ const NoteComponent = ({ onClick, isExpanded }) => {
                   if (!optionsOpen) event.currentTarget.style.backgroundColor = 'transparent'
                 }}
               >
-                <i className="ri-more-2-fill text-sm"></i>
+                <i className="ri-more-2-fill text-sm" style={{ color: '#1e293b' }}></i>
               </button>
               {optionsOpen && (
                 <div
@@ -1082,6 +1403,8 @@ const NoteComponent = ({ onClick, isExpanded }) => {
               )}
             </div>
           </header>
+          {activeIntegration && renderIntegrationMenu()}
+          {shareMenuOpen && renderShareMenu()}
 
           <section className="px-5 py-4 space-y-3">
             {showTitle && (

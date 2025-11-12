@@ -1721,7 +1721,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                                                 <span>
                                                   {leadingPath}
                                                   <span style={{ color: '#16a34a' }}>{lastSegment}</span>
-                                                </span>
+                                            </span>
                                               </span>
                                             )
                                           })()}
@@ -1889,9 +1889,9 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                     }}
                     style={wrapperStyle}
                   >
-                    <NoteComponent 
-                      isExpanded={isExpanded}
-                    />
+                <NoteComponent 
+                  isExpanded={isExpanded}
+                />
                   </div>
                 )
               })}
