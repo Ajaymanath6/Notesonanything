@@ -7,7 +7,8 @@ const Sidebar = ({
   onAddFolder,
   recentNotes,
   selectedRecentNote,
-  onSelectRecentNote
+  onSelectRecentNote,
+  onNavigate
 }) => {
   const renderNoteButton = useCallback(
     (note) => {
@@ -296,12 +297,24 @@ const Sidebar = ({
       </div>
       <div className="px-4 pb-6 space-y-2">
         <button
+          onClick={() => onNavigate?.('accounts')}
           className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors"
-          style={{ color: '#64748b', backgroundColor: 'transparent' }}
-          onMouseEnter={(event) => (event.currentTarget.style.backgroundColor = '#efefef')}
-          onMouseLeave={(event) => (event.currentTarget.style.backgroundColor = 'transparent')}
+          style={{
+            color: '#64748b',
+            backgroundColor: currentView === 'accounts' ? '#efefef' : 'transparent'
+          }}
+          onMouseEnter={(event) => {
+            if (currentView !== 'accounts') {
+              event.currentTarget.style.backgroundColor = '#efefef'
+            }
+          }}
+          onMouseLeave={(event) => {
+            if (currentView !== 'accounts') {
+              event.currentTarget.style.backgroundColor = 'transparent'
+            }
+          }}
         >
-          <i className="ri-user-3-line text-lg" style={{ color: '#64748b' }}></i>
+          <i className="ri-user-3-line text-lg" style={{ color: currentView === 'accounts' ? '#372804' : '#64748b' }}></i>
           <span className="text-sm font-medium" style={{ color: '#1e293b' }}>
             Account
           </span>

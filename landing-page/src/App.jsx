@@ -98,6 +98,7 @@ import GrayNoteThread from "./GrayNoteThread";
 import OvalNoteThread from "./OvalNoteThread";
 import Auth from "./Auth";
 import Dashboard from "./Dashboard";
+import Accounts from "./Accounts";
 import Canvas from "./Canvas";
 import NoteDetail from "./NoteDetail";
 import { 
@@ -1810,6 +1811,10 @@ function App() {
 
   if (currentView === "notedetail") {
     return <NoteDetail onBack={() => setCurrentView("dashboard")} onLogout={handleLogout} />;
+  }
+
+  if (currentView === "accounts") {
+    return <Accounts onBack={() => setCurrentView("dashboard")} onLogout={handleLogout} onNavigate={setCurrentView} />;
   }
 
   // Landing page view

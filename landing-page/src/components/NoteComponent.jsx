@@ -274,6 +274,7 @@ const NoteComponent = ({ onClick, isExpanded }) => {
         return
       }
       closeAllDropdowns()
+      closeShareMenu()
       if (integration === 'jira') {
         resetJiraState()
       } else {
@@ -286,7 +287,7 @@ const NoteComponent = ({ onClick, isExpanded }) => {
       setActiveIntegration(integration)
       setOptionsOpen(false)
     },
-    [activeIntegration, closeAllDropdowns, closeIntegrationMenu, resetJiraState, resetNotionState]
+    [activeIntegration, closeAllDropdowns, closeIntegrationMenu, closeShareMenu, resetJiraState, resetNotionState]
   )
 
   useEffect(() => {
@@ -1333,7 +1334,13 @@ const NoteComponent = ({ onClick, isExpanded }) => {
                 onClick={(event) => {
                   event.preventDefault()
                   event.stopPropagation()
-                  setOptionsOpen((prev) => !prev)
+                  if (optionsOpen) {
+                    setOptionsOpen(false)
+                  } else {
+                    closeIntegrationMenu()
+                    closeShareMenu()
+                    setOptionsOpen(true)
+                  }
                 }}
                 onMouseEnter={(event) => {
                   event.currentTarget.style.backgroundColor = '#ffffff'

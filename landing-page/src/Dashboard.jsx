@@ -1276,6 +1276,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
         recentNotes={sidebarRecentNotes}
         selectedRecentNote={selectedRecentNote}
         onSelectRecentNote={handleRecentNoteSelect}
+        onNavigate={onNavigate}
       />
 
       {/* Main Content */}
