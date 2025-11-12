@@ -101,6 +101,7 @@ import Dashboard from "./Dashboard";
 import Accounts from "./Accounts";
 import Canvas from "./Canvas";
 import NoteDetail from "./NoteDetail";
+import ComingSoon from "./pages/ComingSoon";
 import { 
   ArrowRight, 
   Check, 
@@ -1815,6 +1816,10 @@ function App() {
 
   if (currentView === "accounts") {
     return <Accounts onBack={() => setCurrentView("dashboard")} onLogout={handleLogout} onNavigate={setCurrentView} />;
+  }
+
+  if (currentView === "coming-soon") {
+    return <ComingSoon onNavigate={setCurrentView} onLogout={handleLogout} />;
   }
 
   // Landing page view

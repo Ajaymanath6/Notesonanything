@@ -2039,20 +2039,20 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                 disabled={!newWorkspaceName.trim()}
                 className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
                 style={{
-                  backgroundColor: newWorkspaceName.trim() ? '#372804' : '#e5e7eb',
-                  color: newWorkspaceName.trim() ? '#FFF097' : '#9ca3af',
+                  backgroundColor: newWorkspaceName.trim() ? '#000000' : '#e5e7eb',
+                  color: newWorkspaceName.trim() ? '#ffffff' : '#9ca3af',
                   border: '2px solid #e2e8f0',
                   boxShadow: 'rgba(16, 24, 40, 0.05) 0px 1px 2px',
                   cursor: newWorkspaceName.trim() ? 'pointer' : 'not-allowed'
                 }}
                 onMouseEnter={(e) => {
                   if (newWorkspaceName.trim()) {
-                    e.target.style.backgroundColor = '#2d1f02'
+                    e.target.style.backgroundColor = '#1a1a1a'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (newWorkspaceName.trim()) {
-                    e.target.style.backgroundColor = '#372804'
+                    e.target.style.backgroundColor = '#000000'
                   }
                 }}
               >

@@ -331,13 +331,25 @@ const Sidebar = ({
           </span>
         </button>
         <button
+          onClick={() => onNavigate?.('coming-soon')}
           className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors"
-          style={{ color: '#64748b', backgroundColor: 'transparent' }}
-          onMouseEnter={(event) => (event.currentTarget.style.backgroundColor = '#efefef')}
-          onMouseLeave={(event) => (event.currentTarget.style.backgroundColor = 'transparent')}
+          style={{ 
+            color: currentView === 'coming-soon' ? '#1e293b' : '#64748b', 
+            backgroundColor: currentView === 'coming-soon' ? '#efefef' : 'transparent' 
+          }}
+          onMouseEnter={(event) => {
+            if (currentView !== 'coming-soon') {
+              event.currentTarget.style.backgroundColor = '#efefef'
+            }
+          }}
+          onMouseLeave={(event) => {
+            if (currentView !== 'coming-soon') {
+              event.currentTarget.style.backgroundColor = 'transparent'
+            }
+          }}
         >
-          <i className="ri-rocket-line text-lg" style={{ color: '#f97316' }}></i>
-          <span className="text-sm font-medium" style={{ color: '#1e293b' }}>
+          <i className="ri-rocket-line text-lg" style={{ color: currentView === 'coming-soon' ? '#372804' : '#f97316' }}></i>
+          <span className="text-sm font-medium" style={{ color: currentView === 'coming-soon' ? '#1e293b' : '#1e293b' }}>
             Upgrade to Premium
           </span>
         </button>
