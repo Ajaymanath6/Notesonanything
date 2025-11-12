@@ -28,6 +28,7 @@ import GrayNoteThread from './GrayNoteThread'
 import OvalNoteThread from './OvalNoteThread'
 import NoteComponent from './components/NoteComponent'
 import Sidebar from './components/Sidebar'
+import PurchaseButton from './components/PurchaseButton'
 
 const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
   // selectedWorkspace will be managed through activeWorkspace state
@@ -1503,25 +1504,12 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
               </button>
 
               {/* Premium Upsell Button */}
-              <button
+              <PurchaseButton
                 onClick={() => console.log('✨ Upgrade flow coming soon')}
-                className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
-                style={{
-                  backgroundColor: '#ffffff',
-                  color: '#1e293b',
-                  border: '2px solid #e2e8f0',
-                  boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#ffffff'
-                }}
                 title="Upgrade to unlock unlimited notes"
               >
-                <span>Get Unlimited Notes</span>
-              </button>
+                Get Unlimited Notes
+              </PurchaseButton>
             </div>
           </div>
         </header>
@@ -1870,9 +1858,9 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   borderRadius: '14px',
                   transition: 'background 0.3s ease, box-shadow 0.3s ease',
                   border: '1px solid transparent',
-                  ...(isHighlighted
+                    ...(isHighlighted
                     ? {
-                        background: 'linear-gradient(90deg, rgba(22, 163, 74, 0.2) 0%, rgba(255, 255, 255, 1) 100%)',
+                        background: 'linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(22, 163, 74, 0.2) 100%)',
                         border: '1px solid #E5E7EB',
                         boxShadow:
                           '0 1px 3px rgba(0, 0, 0, 0.05), inset 0 0 8px rgba(22, 163, 74, 0.25)'
@@ -1891,9 +1879,15 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                       }
                     }}
                     style={wrapperStyle}
+                    onClick={() => {
+                      setHighlightedNoteId(note.id)
+                    }}
                   >
                 <NoteComponent 
                   isExpanded={isExpanded}
+                  onClick={() => {
+                    setHighlightedNoteId(note.id)
+                  }}
                 />
                   </div>
                 )
@@ -1956,14 +1950,24 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   onChange={(e) => setNewWorkspaceName(e.target.value)}
                   onKeyDown={handleFolderKeyDown}
                   placeholder="Enter folder name..."
-                  className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none transition-colors"
+                  className="px-4 py-2 rounded-xl text-sm focus:outline-none transition-all duration-200"
                   style={{
-                    backgroundColor: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    color: '#1e293b'
+                    width: '100%',
+                    backgroundColor: '#ffffff',
+                    border: '2px solid #e2e8f0',
+                    color: '#1e293b',
+                    boxShadow: 'rgba(16, 24, 40, 0.05) 0px 1px 2px'
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#372804'}
-                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#efefef'
+                    e.target.style.backgroundColor = '#efefef'
+                    e.target.style.boxShadow = '0 0 0 2px rgba(16, 24, 40, 0.08)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e2e8f0'
+                    e.target.style.backgroundColor = '#ffffff'
+                    e.target.style.boxShadow = 'rgba(16, 24, 40, 0.05) 0px 1px 2px'
+                  }}
                   autoFocus
                 />
               </div>
@@ -1979,14 +1983,24 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   onKeyDown={handleFolderKeyDown}
                   placeholder="Describe your folder..."
                   rows="3"
-                  className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none transition-colors resize-none"
+                  className="px-4 py-2 rounded-xl text-sm focus:outline-none transition-all duration-200 resize-none"
                   style={{
-                    backgroundColor: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    color: '#1e293b'
+                    width: '100%',
+                    backgroundColor: '#ffffff',
+                    border: '2px solid #e2e8f0',
+                    color: '#1e293b',
+                    boxShadow: 'rgba(16, 24, 40, 0.05) 0px 1px 2px'
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#372804'}
-                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#efefef'
+                    e.target.style.backgroundColor = '#efefef'
+                    e.target.style.boxShadow = '0 0 0 2px rgba(16, 24, 40, 0.08)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e2e8f0'
+                    e.target.style.backgroundColor = '#ffffff'
+                    e.target.style.boxShadow = 'rgba(16, 24, 40, 0.05) 0px 1px 2px'
+                  }}
                 />
               </div>
 
@@ -2004,25 +2018,32 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   setNewWorkspaceName('')
                   setNewWorkspaceDescription('')
                 }}
-                className="px-4 py-2 text-sm rounded-lg transition-colors"
+                className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
                 style={{
-                  color: '#64748b',
-                  backgroundColor: 'transparent',
-                  border: '1px solid #e2e8f0'
+                  backgroundColor: '#efefef',
+                  color: '#1e293b',
+                  border: '2px solid #e2e8f0',
+                  boxShadow: 'rgba(16, 24, 40, 0.05) 0px 1px 2px'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#f8fafc'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#efefef'
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateFolder}
                 disabled={!newWorkspaceName.trim()}
-                className="px-4 py-2 text-sm rounded-lg transition-colors"
+                className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
                 style={{
                   backgroundColor: newWorkspaceName.trim() ? '#372804' : '#e5e7eb',
-                  color: newWorkspaceName.trim() ? '#ffffff' : '#9ca3af',
-                  border: 'none'
+                  color: newWorkspaceName.trim() ? '#FFF097' : '#9ca3af',
+                  border: '2px solid #e2e8f0',
+                  boxShadow: 'rgba(16, 24, 40, 0.05) 0px 1px 2px',
+                  cursor: newWorkspaceName.trim() ? 'pointer' : 'not-allowed'
                 }}
                 onMouseEnter={(e) => {
                   if (newWorkspaceName.trim()) {
