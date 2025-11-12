@@ -56,6 +56,29 @@ const NOTION_TEMPLATES = [
 const NOTION_STATUS_OPTIONS = ['Backlog', 'In Progress', 'Review', 'Published']
 const NOTION_TAGS = ['Engineering', 'Design', 'Product', 'Bug', 'Research']
 
+// Helper function to extract company name from URL
+const extractCompanyName = (urlString) => {
+  try {
+    const url = new URL(urlString)
+    const hostname = url.hostname
+    // Remove www. if present
+    const domain = hostname.replace(/^www\./, '')
+    // Extract the main domain name (e.g., "unicourt" from "dart.unicourt.com")
+    const parts = domain.split('.')
+    if (parts.length >= 2) {
+      // Get the second-to-last part (usually the company name)
+      const companyPart = parts[parts.length - 2]
+      // Capitalize first letter of each word
+      return companyPart.split('-').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(' ')
+    }
+    return domain
+  } catch {
+    return ''
+  }
+}
+
 // Helper function to format URL for display
 const formatUrlForDisplay = (urlString) => {
   try {
@@ -1228,7 +1251,10 @@ const NoteComponent = ({ onClick, isExpanded }) => {
                     e.target.onerror = null
                   }}
                 />
-                <span>{formatUrlForDisplay('https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation')}</span>
+                <span>
+                  <span style={{ fontWeight: 600 }}>{extractCompanyName('https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation')}</span>
+                  {formatUrlForDisplay('https://dart.unicourt.com/PXsgD/deep/widgets/search/unicourt-search/1.0.2510161026/documentation')}
+                </span>
             </a>
             </div>
             <div className="absolute inset-y-0 right-2 flex items-center gap-2">

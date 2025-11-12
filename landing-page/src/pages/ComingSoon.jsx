@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import Sidebar from '../components/Sidebar'
 
 const ComingSoon = ({ onNavigate, onLogout }) => {
   const [email, setEmail] = useState('')
@@ -13,39 +12,49 @@ const ComingSoon = ({ onNavigate, onLogout }) => {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: '#f8fafc' }}>
-        <Sidebar
-          currentView="coming-soon"
-          onSelectView={(view) => {
-            if (view === 'home' || view === 'folders') {
-              onNavigate('dashboard')
-            }
-          }}
-          onAddFolder={null}
-          recentNotes={[]}
-          selectedRecentNote={null}
-          onSelectRecentNote={null}
-          onNavigate={onNavigate}
-        />
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f8fafc' }}>
+        {/* Back Arrow */}
+        <div className="absolute top-6 left-6 z-20">
+          <button
+            onClick={() => onNavigate('dashboard')}
+            className="flex items-center justify-center w-10 h-10 rounded-lg transition-colors"
+            style={{
+              backgroundColor: '#ffffff',
+              border: '1px solid #e2e8f0',
+              color: '#1e293b'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#efefef'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#ffffff'
+            }}
+            title="Back to Dashboard"
+          >
+            <i className="ri-arrow-left-line text-lg"></i>
+          </button>
+        </div>
         
         <div 
           className="flex-1 flex items-center justify-center relative overflow-hidden"
           style={{
-            backgroundImage: `
-              repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(226, 232, 240, 0.3) 20px, rgba(226, 232, 240, 0.3) 21px),
-              repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(226, 232, 240, 0.3) 20px, rgba(226, 232, 240, 0.3) 21px)
-            `,
-            backgroundColor: '#f8fafc',
+            backgroundColor: '#f1f5f9',
             position: 'relative'
           }}
         >
-          {/* Candy-style gradient background overlay */}
+          {/* Grid pattern in center fading away */}
           <div
-            className="absolute inset-0 opacity-10"
+            className="absolute inset-0"
             style={{
-              background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.3) 0%, rgba(22, 163, 74, 0.3) 30%, rgba(249, 115, 22, 0.3) 30%, rgba(249, 115, 22, 0.3) 60%, rgba(139, 92, 246, 0.3) 60%, rgba(59, 130, 246, 0.3) 100%)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)'
+              backgroundImage: `
+                radial-gradient(circle at center, 
+                  repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(226, 232, 240, 0.4) 20px, rgba(226, 232, 240, 0.4) 21px),
+                  repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(226, 232, 240, 0.4) 20px, rgba(226, 232, 240, 0.4) 21px)
+                ),
+                radial-gradient(ellipse 80% 80% at center, rgba(226, 232, 240, 0.3) 0%, rgba(226, 232, 240, 0.2) 30%, rgba(226, 232, 240, 0.1) 60%, transparent 100%)
+              `,
+              backgroundSize: '100% 100%, 100% 100%',
+              backgroundPosition: 'center, center'
             }}
           />
 
@@ -71,89 +80,100 @@ const ComingSoon = ({ onNavigate, onLogout }) => {
 
           {/* Main Content */}
           <div className="relative z-10 flex flex-col items-center max-w-2xl mx-auto px-6">
-            {/* COMING SOON Text with most rounded font */}
+            {/* COMING SOON Text with badges */}
             <h1
-              className="text-8xl md:text-9xl font-bold mb-12"
+              className="text-8xl md:text-9xl font-bold mb-12 text-center relative"
               style={{
                 fontFamily: "'Baloo 2', sans-serif",
-                color: '#94a3b8',
-                textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                color: '#475569',
                 letterSpacing: '0.05em',
-                fontWeight: 700
+                fontWeight: 800,
+                lineHeight: '0.9'
               }}
             >
-              COMING SOON
-            </h1>
-
-            {/* Email Form Card - styled like share menu with CandyButton border */}
-            <div
-              className="w-full max-w-md bg-white rounded-lg shadow-xl"
-              style={{
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 1px 0 rgba(255, 255, 255, 0.2) inset'
-              }}
-            >
-              <div className="p-4 space-y-4">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                  <h3 
-                    className="text-sm font-semibold" 
-                    style={{ 
-                      color: '#1e293b',
-                      fontFamily: "'Baloo 2', sans-serif",
-                      fontWeight: 600
+              <div style={{ 
+                textAlign: 'center', 
+                position: 'relative',
+                display: 'inline-block'
+              }}>
+                <span>COMING</span>
+                {/* Badge above C in COMING */}
+                <div
+                  className="flex items-center justify-center flex-shrink-0 absolute"
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                    borderRadius: '12px',
+                    border: '2px solid rgba(255, 255, 255, 0.4)',
+                    backdropFilter: 'blur(12px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2) inset, 0 1px 0 rgba(255, 255, 255, 0.3) inset',
+                    top: '-70px',
+                    left: '8%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 10
+                  }}
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 256 256"
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      color: '#475569'
                     }}
                   >
-                    Get notified
-                  </h3>
-                </div>
-
-                {/* Email Input Section */}
-                <div className="space-y-2">
-                  <p 
-                    className="text-sm" 
-                    style={{ 
-                      color: '#64748b',
-                      fontFamily: "'Baloo 2', sans-serif",
-                      fontWeight: 400
-                    }}
-                  >
-                    Want to learn how to add 3D to your websites?
-                  </p>
-                  <form onSubmit={handleSubmit} className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Add your email to get notified"
-                        required
-                        className="flex-1 px-3 py-2 text-xs rounded-lg border focus:outline-none transition-colors"
-                        style={{
-                          borderColor: '#e2e8f0',
-                          color: '#1e293b',
-                          backgroundColor: '#ffffff'
-                        }}
-                        onFocus={(e) => e.target.style.borderColor = '#cbd5e1'}
-                        onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-                      />
-                      <button
-                        type="submit"
-                        className="px-4 py-2 text-xs font-medium rounded-lg transition-colors"
-                        style={{
-                          backgroundColor: '#1e293b',
-                          color: '#ffffff'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#374151'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = '#1e293b'}
-                      >
-                        Notify
-                      </button>
-                    </div>
-                  </form>
+                    <rect width="256" height="256" fill="none"/>
+                    <path d="M160,160h40a40,40,0,0,0,0-80H160Z" opacity="0.2"/>
+                    <path d="M160,80V200.67a8,8,0,0,0,3.56,6.65l11,7.33a8,8,0,0,0,12.2-4.72L200,160" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16"/>
+                    <path d="M40,200a8,8,0,0,0,13.15,6.12C105.55,162.16,160,160,160,160h40a40,40,0,0,0,0-80H160S105.55,77.84,53.15,33.89A8,8,0,0,0,40,40Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16"/>
+                  </svg>
                 </div>
               </div>
-            </div>
+              <div style={{ 
+                textAlign: 'center',
+                position: 'relative',
+                display: 'inline-block'
+              }}>
+                <span>SOON</span>
+                {/* Badge below and right side of N in SOON */}
+                <div
+                  className="flex items-center justify-center flex-shrink-0 absolute"
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                    borderRadius: '12px',
+                    border: '2px solid rgba(255, 255, 255, 0.4)',
+                    backdropFilter: 'blur(12px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2) inset, 0 1px 0 rgba(255, 255, 255, 0.3) inset',
+                    top: '100%',
+                    left: '75%',
+                    transform: 'translateX(-50%)',
+                    marginTop: '1px',
+                    marginLeft: '40px',
+                    zIndex: 10
+                  }}
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 256 256"
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      color: '#475569'
+                    }}
+                  >
+                    <rect width="256" height="256" fill="none"/>
+                    <path d="M160,160h40a40,40,0,0,0,0-80H160Z" opacity="0.2"/>
+                    <path d="M160,80V200.67a8,8,0,0,0,3.56,6.65l11,7.33a8,8,0,0,0,12.2-4.72L200,160" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16"/>
+                    <path d="M40,200a8,8,0,0,0,13.15,6.12C105.55,162.16,160,160,160,160h40a40,40,0,0,0,0-80H160S105.55,77.84,53.15,33.89A8,8,0,0,0,40,40Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16"/>
+                  </svg>
+                </div>
+              </div>
+            </h1>
           </div>
         </div>
 
