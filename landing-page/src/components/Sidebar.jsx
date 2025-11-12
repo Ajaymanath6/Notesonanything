@@ -128,7 +128,7 @@ const Sidebar = ({
   )
 
   return (
-    <div className="w-64 flex flex-col" style={{ backgroundColor: '#ffffff', borderRight: '1px solid #e2e8f0' }}>
+    <div className="w-64 flex flex-col h-screen" style={{ backgroundColor: '#ffffff', borderRight: '1px solid #e2e8f0' }}>
       <div className="px-6 flex items-center" style={{ borderBottom: '1px solid #e2e8f0', height: '56px' }}>
         <div className="flex items-center space-x-3">
           <div

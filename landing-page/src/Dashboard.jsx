@@ -1216,6 +1216,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   </motion.div>
                 )}
               </div>
+              )}
             </div>
           </header>
 
@@ -1280,7 +1281,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-0 relative" style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)' }}>
+      <div className="flex-1 flex flex-col h-screen relative" style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)' }}>
         {/* Dot Pattern Background - Only for Version 1 */}
         {dashboardVersion === 1 && (
           <div 
@@ -1331,7 +1332,8 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* AI Search */}
+              {/* AI Search - Hidden for now */}
+              {false && (
               <div className="relative" ref={searchRef}>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
@@ -1487,6 +1489,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   </motion.div>
                 )}
               </div>
+              )}
 
               {/* Notifications */}
               <button 
@@ -1517,7 +1520,6 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                 }}
                 title="Upgrade to unlock unlimited notes"
               >
-                <i className="ri-infinity-line text-base" style={{ color: '#0ea5e9' }}></i>
                 <span>Get Unlimited Notes</span>
               </button>
             </div>
@@ -1525,7 +1527,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
         </header>
 
         {/* Content Area */}
-      <div className="flex-1 p-6 overflow-y-auto relative z-10" style={{ paddingBottom: '80px', backgroundColor: '#ffffff' }} data-main-content>
+      <div className="flex-1 p-6 overflow-y-auto relative z-10" style={{ paddingBottom: '80px', backgroundColor: '#ffffff', maxHeight: 'calc(100vh - 56px)' }} data-main-content>
           {/* New Note Section */}
           <div className="max-w-4xl mx-auto">
             {/* Heading Group */}
