@@ -116,7 +116,7 @@ const formatUrlForDisplay = (urlString) => {
   }
 }
 
-const NoteComponent = ({ onClick, isExpanded }) => {
+const NoteComponent = ({ onClick, isExpanded, folders = [], onMoveToFolder }) => {
   const pageContext = {
     siteName: 'Tesla Motors',
     siteUrl: 'https://www.tesla.com/investor-relations/dashboard',
@@ -165,6 +165,8 @@ const NoteComponent = ({ onClick, isExpanded }) => {
   const [customTitle, setCustomTitle] = useState(note.title)
   const [isPinned, setIsPinned] = useState(false)
   const [optionsOpen, setOptionsOpen] = useState(false)
+  const [showMoveToMenu, setShowMoveToMenu] = useState(false)
+  const [moveToMenuPosition, setMoveToMenuPosition] = useState(null)
   const [activeIntegration, setActiveIntegration] = useState(null)
   const [integrationMenuPosition, setIntegrationMenuPosition] = useState(null)
   const [shareMenuOpen, setShareMenuOpen] = useState(false)
@@ -173,6 +175,7 @@ const NoteComponent = ({ onClick, isExpanded }) => {
   const jiraButtonRef = useRef(null)
   const notionButtonRef = useRef(null)
   const shareButtonRef = useRef(null)
+  const moveToButtonRef = useRef(null)
 
   // Jira integration state
   const [selectedProject, setSelectedProject] = useState(null)
@@ -404,6 +407,65 @@ const NoteComponent = ({ onClick, isExpanded }) => {
       setSelectedDatabase(fallback)
     }
   }, [selectedWorkspace, selectedDatabase])
+
+  // Update move to menu position
+  useEffect(() => {
+    if (!showMoveToMenu) return
+
+    const updatePosition = () => {
+      if (moveToButtonRef.current) {
+        const rect = moveToButtonRef.current.getBoundingClientRect()
+        setMoveToMenuPosition({
+          top: rect.top,
+          right: window.innerWidth - rect.left
+        })
+      }
+    }
+
+    updatePosition()
+    window.addEventListener('resize', updatePosition)
+    window.addEventListener('scroll', updatePosition, true)
+
+    return () => {
+      window.removeEventListener('resize', updatePosition)
+      window.removeEventListener('scroll', updatePosition, true)
+    }
+  }, [showMoveToMenu])
+
+  // Close move to menu and options dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const optionsMenu = document.querySelector('.options-menu')
+      const moveToMenu = document.querySelector('.move-to-menu')
+      
+      // Check if click is inside the options menu
+      const isInsideOptions = optionsMenu && optionsMenu.contains(event.target)
+      // Check if click is inside the move to menu
+      const isInsideMoveTo = moveToMenu && moveToMenu.contains(event.target)
+      // Check if click is on the move to button
+      const isOnMoveToButton = moveToButtonRef.current && moveToButtonRef.current.contains(event.target)
+      // Check if click is on the options button (three dots)
+      const isOnOptionsButton = event.target.closest('button')?.querySelector('i.ri-more-2-fill')
+      
+      // Only close if click is outside all menus and buttons
+      if (!isInsideOptions && !isInsideMoveTo && !isOnMoveToButton && !isOnOptionsButton) {
+        setShowMoveToMenu(false)
+        setOptionsOpen(false)
+      }
+    }
+
+    if (showMoveToMenu || optionsOpen) {
+      // Use a small delay to avoid closing immediately when opening
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside)
+      }, 100)
+
+      return () => {
+        clearTimeout(timeoutId)
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
+    }
+  }, [showMoveToMenu, optionsOpen])
 
   const handleTagToggle = (tag) => {
     setNotionSelectedTags((prev) =>
@@ -1379,7 +1441,7 @@ const NoteComponent = ({ onClick, isExpanded }) => {
               </button>
               {optionsOpen && (
                 <div
-                  className="absolute right-0 top-full mt-2 w-44 rounded-lg border px-2 py-2 space-y-1 text-xs font-medium shadow-lg"
+                  className="options-menu absolute right-0 top-full mt-2 w-44 rounded-lg border px-2 py-2 space-y-1 text-xs font-medium shadow-lg"
                   style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', zIndex: 20 }}
                   onClick={(event) => event.stopPropagation()}
                 >
@@ -1432,12 +1494,73 @@ const NoteComponent = ({ onClick, isExpanded }) => {
                     <i className="ri-pushpin-2-line text-sm"></i>
                     <span>{isPinned ? 'Unpin this' : 'Pin this'}</span>
                   </button>
+                  <div className="border-t my-1" style={{ borderColor: '#e2e8f0' }}></div>
+                  <button
+                    ref={moveToButtonRef}
+                    className="w-full px-2 py-1 rounded-md text-left transition-colors flex items-center gap-2"
+                    style={{ color: '#0f172a' }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowMoveToMenu(!showMoveToMenu)
+                    }}
+                    onMouseEnter={() => {
+                      if (optionsOpen) {
+                        setShowMoveToMenu(true)
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      // Don't close on mouse leave - let click outside handle it
+                    }}
+                  >
+                    <i className="ri-folder-line text-sm"></i>
+                    <span>Move to</span>
+                  </button>
                 </div>
               )}
             </div>
           </header>
           {activeIntegration && renderIntegrationMenu()}
           {shareMenuOpen && renderShareMenu()}
+          {showMoveToMenu && moveToMenuPosition && folders.length > 0 && createPortal(
+            <div
+              className="move-to-menu w-48 rounded-lg border px-2 py-2 space-y-1 text-xs font-medium shadow-lg"
+              style={{
+                position: 'fixed',
+                top: `${moveToMenuPosition.top}px`,
+                right: `${moveToMenuPosition.right + 8}px`,
+                backgroundColor: '#ffffff',
+                borderColor: '#e2e8f0',
+                zIndex: 9999
+              }}
+              onClick={(event) => event.stopPropagation()}
+              onMouseEnter={() => {
+                setShowMoveToMenu(true)
+              }}
+              onMouseLeave={() => {
+                // Keep menu open when hovering - close only on click outside
+              }}
+            >
+              {folders.map((folder) => (
+                <button
+                  key={folder.id}
+                  className="w-full px-2 py-1.5 rounded-md text-left transition-colors flex items-center gap-2 hover:bg-gray-50"
+                  style={{ color: '#0f172a' }}
+                  onClick={() => {
+                    onMoveToFolder?.(note.id, folder.id)
+                    setShowMoveToMenu(false)
+                    setOptionsOpen(false)
+                  }}
+                >
+                  <div
+                    className="w-3 h-3 rounded"
+                    style={{ backgroundColor: folder.color || '#64748b' }}
+                  ></div>
+                  <span>{folder.name}</span>
+                </button>
+              ))}
+            </div>,
+            document.body
+          )}
 
           <section className="px-5 py-4 space-y-3">
             {showTitle && (

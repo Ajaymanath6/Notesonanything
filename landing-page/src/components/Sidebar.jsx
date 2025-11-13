@@ -8,7 +8,10 @@ const Sidebar = ({
   recentNotes,
   selectedRecentNote,
   onSelectRecentNote,
-  onNavigate
+  onNavigate,
+  folders = [],
+  onSelectFolder,
+  selectedFolder
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
 
@@ -197,6 +200,44 @@ const Sidebar = ({
                 </div>
               )}
             </button>
+            
+            {/* Folders List - Display folders as children of Folders button */}
+            {!isCollapsed && folders.length > 0 && (
+              <div className="ml-8 mt-1 space-y-1">
+                {folders.map((folder) => (
+                  <button
+                    key={folder.id}
+                    onClick={() => onSelectFolder?.(folder)}
+                    className="w-full flex items-center space-x-2 px-3 rounded-lg text-left transition-colors"
+                    style={{
+                      backgroundColor: selectedFolder?.id === folder.id ? '#efefef' : 'transparent',
+                      height: '36px'
+                    }}
+                    onMouseEnter={(event) => {
+                      if (selectedFolder?.id !== folder.id) {
+                        event.currentTarget.style.backgroundColor = '#f5f5f5'
+                      }
+                    }}
+                    onMouseLeave={(event) => {
+                      if (selectedFolder?.id !== folder.id) {
+                        event.currentTarget.style.backgroundColor = 'transparent'
+                      }
+                    }}
+                  >
+                    <div
+                      className="w-3 h-3 rounded"
+                      style={{ backgroundColor: folder.color || '#64748b' }}
+                    ></div>
+                    <span
+                      className="text-sm font-medium truncate flex-1"
+                      style={{ color: '#1e293b' }}
+                    >
+                      {folder.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

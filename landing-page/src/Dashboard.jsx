@@ -256,6 +256,26 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
     }
   }
 
+  // Handle moving note to folder
+  const handleMoveToFolder = (noteId, folderId) => {
+    // Update note with folderId
+    // This would typically update the note in your database/state
+    console.log(`Moving note ${noteId} to folder ${folderId}`)
+    
+    // You can add logic here to update notes state or make API call
+    // For now, we'll just log it
+    const folder = folders.find(f => f.id === folderId)
+    if (folder) {
+      console.log(`Note moved to folder: ${folder.name}`)
+    }
+  }
+
+  // Handle folder selection in sidebar
+  const handleSelectFolder = (folder) => {
+    setSelectedFolder(folder)
+    setCurrentView('folders')
+  }
+
   // Note variants disabled for dashboard - always show consistent appearance
 
   // Calculate notes count for each workspace (for future use)
@@ -1279,6 +1299,9 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
         selectedRecentNote={selectedRecentNote}
         onSelectRecentNote={handleRecentNoteSelect}
         onNavigate={onNavigate}
+        folders={folders}
+        selectedFolder={selectedFolder}
+        onSelectFolder={handleSelectFolder}
       />
 
       {/* Main Content */}
@@ -1888,6 +1911,8 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                   onClick={() => {
                     setHighlightedNoteId(note.id)
                   }}
+                  folders={folders}
+                  onMoveToFolder={handleMoveToFolder}
                 />
                   </div>
                 )
