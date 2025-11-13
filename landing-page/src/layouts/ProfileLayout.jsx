@@ -1,4 +1,4 @@
-const ProfileLayout = () => {
+const ProfileLayout = ({ onLogout }) => {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -126,6 +126,28 @@ const ProfileLayout = () => {
             }}
           >
             Save
+          </button>
+        </div>
+
+        {/* Logout Button */}
+        <div className="pt-2">
+          <button
+            onClick={onLogout}
+            className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
+            style={{
+              backgroundColor: '#efefef',
+              color: '#ef4444',
+              border: '2px solid #e2e8f0',
+              boxShadow: 'rgba(16, 24, 40, 0.05) 0px 1px 2px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f8fafc'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#efefef'
+            }}
+          >
+            Logout
           </button>
         </div>
       </div>

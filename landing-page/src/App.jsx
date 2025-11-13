@@ -2055,24 +2055,25 @@ function App() {
                 {/* Video Container with Border */}
                 <div className="mx-auto" style={{ width: "966px" }}>
                   <div
-                    className="bg-white rounded-lg border"
-                    style={{ padding: "8px" }}
+                    className="rounded-lg"
+                    style={{
+                      padding: "8px",
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #E5E7EB',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                      transition: 'background 0.3s ease, box-shadow 0.3s ease'
+                    }}
                   >
-                    <video
+                    <img
+                      src={`${import.meta.env.BASE_URL || '/'}ui.png`}
+                      alt="UI Preview"
                       className="rounded-b-md w-full h-full"
                       style={{
                         width: "948px",
                         height: "639px",
                         objectFit: "fill",
                       }}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                    >
-                      <source src={`${import.meta.env.BASE_URL || '/'}noav`} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
+                    />
                   </div>
                 </div>
               </div>
@@ -3235,8 +3236,6 @@ function App() {
               justifyContent: "center",
               zIndex: 100000,
               borderRadius: "24px",
-              border: "3px solid #10B981",
-              boxShadow: "0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.2)",
             }}
           >
             <video
@@ -3246,6 +3245,7 @@ function App() {
               style={{
                 width: "100%",
                 height: "100%",
+                borderRadius: "20px",
               }}
             >
               <source src="/noav" type="video/mp4" />

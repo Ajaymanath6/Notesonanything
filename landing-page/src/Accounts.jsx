@@ -76,7 +76,7 @@ const Accounts = ({ onBack, onLogout, onNavigate }) => {
 
             {/* Tab Content */}
             <div className="mt-6">
-              {activeTab === 'profile' && <ProfileLayout />}
+              {activeTab === 'profile' && <ProfileLayout onLogout={onLogout} />}
               {activeTab === 'appearance' && <AppearanceLayout />}
               {activeTab === 'settings' && <SettingsLayout />}
             </div>
