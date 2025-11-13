@@ -163,7 +163,8 @@ const ComingSoon = ({ onNavigate, onLogout }) => {
                     style={{
                       width: '56px',
                       height: '56px',
-                      color: '#475569'
+                      color: '#475569',
+                      transform: 'scaleX(-1)'
                     }}
                   >
                     <rect width="256" height="256" fill="none"/>

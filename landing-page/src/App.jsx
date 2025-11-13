@@ -102,6 +102,9 @@ import Accounts from "./Accounts";
 import Canvas from "./Canvas";
 import NoteDetail from "./NoteDetail";
 import ComingSoon from "./pages/ComingSoon";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Upgrade from "./pages/Upgrade";
 import { 
   ArrowRight, 
   Check, 
@@ -1822,6 +1825,18 @@ function App() {
     return <ComingSoon onNavigate={setCurrentView} onLogout={handleLogout} />;
   }
 
+  if (currentView === "privacy-policy") {
+    return <PrivacyPolicy onNavigate={setCurrentView} />;
+  }
+
+  if (currentView === "terms-of-service") {
+    return <TermsOfService onNavigate={setCurrentView} />;
+  }
+
+  if (currentView === "upgrade") {
+    return <Upgrade onNavigate={setCurrentView} />;
+  }
+
   // Landing page view
   return (
     <div 
@@ -3289,18 +3304,18 @@ function App() {
             
             {/* Links */}
             <div className="flex items-center space-x-8 text-sm">
-              <a
-                href="#"
+              <button
+                onClick={() => setCurrentView("privacy-policy")}
                 className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
               >
                 Privacy Policy
-              </a>
-              <a
-                href="#"
+              </button>
+              <button
+                onClick={() => setCurrentView("terms-of-service")}
                 className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
               >
                 Terms of Service
-              </a>
+              </button>
             </div>
           </div>
         </div>

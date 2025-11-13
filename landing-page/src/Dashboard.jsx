@@ -1505,7 +1505,7 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
 
               {/* Premium Upsell Button */}
               <PurchaseButton
-                onClick={() => console.log('✨ Upgrade flow coming soon')}
+                onClick={() => onNavigate?.('upgrade')}
                 title="Upgrade to unlock unlimited notes"
               >
                 Get Unlimited Notes

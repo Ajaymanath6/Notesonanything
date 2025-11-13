@@ -93,11 +93,18 @@ const Auth = ({ onAuthSuccess }) => {
           <button
             onClick={handleGoogleAuth}
             disabled={isLoading}
-            className="w-full flex items-center justify-center space-x-3 px-4 py-3 border rounded-lg mb-6 transition-all duration-200 hover:bg-gray-50"
+            className="w-full flex items-center justify-center space-x-3 px-4 py-2 rounded-xl text-sm font-medium transition-colors mb-6"
             style={{ 
-              borderColor: '#e5e7eb',
-              backgroundColor: 'white',
-              color: '#374151'
+              backgroundColor: '#ffffff',
+              color: '#1e293b',
+              border: '2px solid #e2e8f0',
+              boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f8fafc'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#ffffff'
             }}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -147,14 +154,23 @@ const Auth = ({ onAuthSuccess }) => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none transition-all duration-200"
+                    className="w-full pl-10 pr-4 py-2 rounded-xl text-sm focus:outline-none transition-all duration-200"
                     style={{ 
-                      border: '1px solid #e5e7eb',
-                      backgroundColor: 'white',
-                      color: '#1f2937'
+                      border: '2px solid #e2e8f0',
+                      backgroundColor: '#ffffff',
+                      color: '#1e293b',
+                      boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
                     }}
-                    onFocus={(e) => e.target.style.border = '1px solid #372804'}
-                    onBlur={(e) => e.target.style.border = '1px solid #e5e7eb'}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#efefef'
+                      e.target.style.backgroundColor = '#efefef'
+                      e.target.style.boxShadow = '0 0 0 2px rgba(16, 24, 40, 0.08)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#e2e8f0'
+                      e.target.style.backgroundColor = '#ffffff'
+                      e.target.style.boxShadow = '0 1px 2px rgba(16, 24, 40, 0.05)'
+                    }}
                     placeholder="Enter your full name"
                     required={!isLogin}
                   />
@@ -181,14 +197,23 @@ const Auth = ({ onAuthSuccess }) => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-2 rounded-xl text-sm focus:outline-none transition-all duration-200"
                   style={{ 
-                    border: '1px solid #e5e7eb',
-                    backgroundColor: 'white',
-                    color: '#1f2937'
+                    border: '2px solid #e2e8f0',
+                    backgroundColor: '#ffffff',
+                    color: '#1e293b',
+                    boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
                   }}
-                  onFocus={(e) => e.target.style.border = '1px solid #372804'}
-                  onBlur={(e) => e.target.style.border = '1px solid #e5e7eb'}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#efefef'
+                    e.target.style.backgroundColor = '#efefef'
+                    e.target.style.boxShadow = '0 0 0 2px rgba(16, 24, 40, 0.08)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e2e8f0'
+                    e.target.style.backgroundColor = '#ffffff'
+                    e.target.style.boxShadow = '0 1px 2px rgba(16, 24, 40, 0.05)'
+                  }}
                   placeholder="Enter your email"
                   required
                 />
@@ -214,14 +239,23 @@ const Auth = ({ onAuthSuccess }) => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-12 py-3 rounded-lg focus:outline-none transition-all duration-200"
+                  className="w-full pl-10 pr-12 py-2 rounded-xl text-sm focus:outline-none transition-all duration-200"
                   style={{ 
-                    border: '1px solid #e5e7eb',
-                    backgroundColor: 'white',
-                    color: '#1f2937'
+                    border: '2px solid #e2e8f0',
+                    backgroundColor: '#ffffff',
+                    color: '#1e293b',
+                    boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
                   }}
-                  onFocus={(e) => e.target.style.border = '1px solid #372804'}
-                  onBlur={(e) => e.target.style.border = '1px solid #e5e7eb'}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#efefef'
+                    e.target.style.backgroundColor = '#efefef'
+                    e.target.style.boxShadow = '0 0 0 2px rgba(16, 24, 40, 0.08)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e2e8f0'
+                    e.target.style.backgroundColor = '#ffffff'
+                    e.target.style.boxShadow = '0 1px 2px rgba(16, 24, 40, 0.05)'
+                  }}
                   placeholder="Enter your password"
                   required
                 />
@@ -242,10 +276,22 @@ const Auth = ({ onAuthSuccess }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-lg disabled:opacity-50"
+              className="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
               style={{
-                backgroundColor: '#000000',
-                color: '#ffffff'
+                backgroundColor: '#ffffff',
+                color: '#1e293b',
+                border: '2px solid #e2e8f0',
+                boxShadow: '0 1px 2px rgba(16, 24, 40, 0.05)'
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading) {
+                  e.currentTarget.style.backgroundColor = '#f8fafc'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isLoading) {
+                  e.currentTarget.style.backgroundColor = '#ffffff'
+                }
               }}
             >
               {isLoading ? (
