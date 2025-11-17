@@ -449,6 +449,31 @@ const Sidebar = ({
           )}
         </button>
         <button
+          className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 rounded-lg text-left transition-colors relative`}
+          style={{ 
+            color: '#64748b', 
+            backgroundColor: 'transparent',
+            height: '40px'
+          }}
+          title={isCollapsed ? 'Notifications' : undefined}
+          onMouseEnter={(event) => (event.currentTarget.style.backgroundColor = '#efefef')}
+          onMouseLeave={(event) => (event.currentTarget.style.backgroundColor = 'transparent')}
+        >
+          <i 
+            className="ri-notification-3-line" 
+            style={{ 
+              color: '#64748b',
+              fontSize: isCollapsed ? '20px' : '18px'
+            }}
+          ></i>
+          {!isCollapsed && (
+          <span className="text-sm font-medium" style={{ color: '#1e293b' }}>
+            Notifications
+          </span>
+          )}
+          <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+        </button>
+        <button
           onClick={() => onNavigate?.('coming-soon')}
           className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 rounded-lg text-left transition-colors`}
           style={{ 

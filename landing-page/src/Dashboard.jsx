@@ -2,7 +2,6 @@ import { motion } from 'framer-motion'
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { 
   Search,
-  Bell,
   User,
   Settings,
   Grid3X3,
@@ -1514,17 +1513,6 @@ const Dashboard = ({ userNotes = [], onLogout, onNavigate }) => {
                 )}
               </div>
               )}
-
-              {/* Notifications */}
-              <button 
-                className="p-1.5 rounded-lg transition-colors relative"
-                style={{ color: '#64748b' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-              >
-                <Bell className="h-4 w-4" />
-                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></div>
-              </button>
 
               {/* Premium Upsell Button */}
               <PurchaseButton
