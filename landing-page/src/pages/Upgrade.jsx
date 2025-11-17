@@ -52,7 +52,7 @@ const Upgrade = ({ onNavigate }) => {
           maxWidth: '780px',
           marginLeft: 'auto',
           marginRight: 'auto',
-          padding: '64px 24px 32px',
+          padding: '64px 24px 64px',
           display: 'flex',
           position: 'relative'
         }}
@@ -173,6 +173,7 @@ const Upgrade = ({ onNavigate }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="space-y-6"
+            style={{ padding: '0 20px' }}
           >
             {/* Badge - Always visible */}
             <div 
@@ -212,23 +213,24 @@ const Upgrade = ({ onNavigate }) => {
                 textAlign: 'center'
               }}
             >
-              No Spam. Only updates and early access to NOA Extension. Join thousands of creators using NOA for better collaboration.
+              No Spam. Only updates and early access to NOA Extension. Join thousands of creators using NOA.
             </p>
 
             {/* Form or Success Message */}
             {!isSubmitted ? (
-              <form onSubmit={handleSubmit} className="flex items-center gap-3">
+              <form onSubmit={handleSubmit} className="flex items-center gap-3" style={{ maxWidth: '380px', margin: '0 auto', width: '100%' }}>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="flex-1 px-4 py-2 focus:outline-none"
+                    className="px-4 py-2 focus:outline-none"
                     style={{ 
                       color: '#1e293b',
                       backgroundColor: '#fff',
                       border: '1px solid #e5e7eb',
                       borderRadius: '6px',
                       height: '32px',
+                      width: '234px',
                       marginBottom: 0,
                       paddingTop: '6px',
                       paddingBottom: '6px',
@@ -247,7 +249,7 @@ const Upgrade = ({ onNavigate }) => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="whitespace-nowrap disabled:opacity-50 font-semibold"
+                    className="whitespace-nowrap disabled:opacity-50 font-semibold flex-1"
                     style={{
                       color: '#ffffff',
                       background: 'linear-gradient(180deg, rgba(16, 185, 129, 1) 0%, rgba(5, 150, 105, 1) 100%)',
