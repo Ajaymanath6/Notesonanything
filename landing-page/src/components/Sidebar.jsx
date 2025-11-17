@@ -272,119 +272,119 @@ const Sidebar = ({
             )}
             <div className="space-y-1">
               {recentNotes.map((note) => {
-                const isSelected = selectedRecentNote === note.id
-                return (
-                  <button
-                    key={note.id}
-                    onClick={() => onSelectRecentNote?.(note)}
+      const isSelected = selectedRecentNote === note.id
+      return (
+        <button
+          key={note.id}
+          onClick={() => onSelectRecentNote?.(note)}
                     className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 rounded-lg cursor-pointer transition-colors text-left`}
-                    style={{
-                      backgroundColor: isSelected ? '#efefef' : 'transparent',
+          style={{
+            backgroundColor: isSelected ? '#efefef' : 'transparent',
                       height: '40px'
-                    }}
+          }}
                     title={isCollapsed ? note.label : undefined}
-                    onMouseEnter={(event) => {
-                      if (!isSelected) {
-                        event.currentTarget.style.backgroundColor = '#efefef'
-                      }
-                    }}
-                    onMouseLeave={(event) => {
-                      if (!isSelected) {
-                        event.currentTarget.style.backgroundColor = 'transparent'
-                      }
-                    }}
-                  >
-                    <svg
+          onMouseEnter={(event) => {
+            if (!isSelected) {
+              event.currentTarget.style.backgroundColor = '#efefef'
+            }
+          }}
+          onMouseLeave={(event) => {
+            if (!isSelected) {
+              event.currentTarget.style.backgroundColor = 'transparent'
+            }
+          }}
+        >
+          <svg
                       width="20"
                       height="20"
-                      viewBox="0 0 256 256"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="flex-shrink-0"
-                      style={{
-                        color: isSelected ? '#372804' : '#64748b'
-                      }}
-                    >
-                      <rect width="256" height="256" fill="none" />
-                      <path
-                        d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                        opacity="0.2"
-                        fill="currentColor"
-                      />
-                      <line
-                        x1="96"
-                        y1="128"
-                        x2="160"
-                        y2="128"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="16"
-                      />
-                      <line
-                        x1="96"
-                        y1="160"
-                        x2="160"
-                        y2="160"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="16"
-                      />
-                      <path
-                        d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="16"
-                      />
-                      <line
-                        x1="80"
-                        y1="24"
-                        x2="80"
-                        y2="56"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="16"
-                      />
-                      <line
-                        x1="128"
-                        y1="24"
-                        x2="128"
-                        y2="56"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="16"
-                      />
-                      <line
-                        x1="176"
-                        y1="24"
-                        x2="176"
-                        y2="56"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="16"
-                      />
-                    </svg>
+            viewBox="0 0 256 256"
+            xmlns="http://www.w3.org/2000/svg"
+            className="flex-shrink-0"
+            style={{
+              color: isSelected ? '#372804' : '#64748b'
+            }}
+          >
+            <rect width="256" height="256" fill="none" />
+            <path
+              d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+              opacity="0.2"
+              fill="currentColor"
+            />
+            <line
+              x1="96"
+              y1="128"
+              x2="160"
+              y2="128"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+            <line
+              x1="96"
+              y1="160"
+              x2="160"
+              y2="160"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+            <path
+              d="M48,40H208V200a24,24,0,0,1-24,24H72a24,24,0,0,1-24-24Z"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+            <line
+              x1="80"
+              y1="24"
+              x2="80"
+              y2="56"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+            <line
+              x1="128"
+              y1="24"
+              x2="128"
+              y2="56"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+            <line
+              x1="176"
+              y1="24"
+              x2="176"
+              y2="56"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+          </svg>
                     {!isCollapsed && (
-                      <div
-                        className="text-sm font-medium truncate flex-1"
-                        style={{ color: '#1e293b' }}
-                        title={note.label}
-                      >
-                        {note.label}
-                      </div>
+          <div
+            className="text-sm font-medium truncate flex-1"
+            style={{ color: '#1e293b' }}
+            title={note.label}
+          >
+            {note.label}
+          </div>
                     )}
-                  </button>
-                )
+        </button>
+      )
               })}
             </div>
           </>
@@ -419,9 +419,9 @@ const Sidebar = ({
             }}
           ></i>
           {!isCollapsed && (
-            <span className="text-sm font-medium" style={{ color: '#1e293b' }}>
-              Account
-            </span>
+          <span className="text-sm font-medium" style={{ color: '#1e293b' }}>
+            Account
+          </span>
           )}
         </button>
         <button
@@ -443,9 +443,9 @@ const Sidebar = ({
             }}
           ></i>
           {!isCollapsed && (
-            <span className="text-sm font-medium" style={{ color: '#1e293b' }}>
-              Settings
-            </span>
+          <span className="text-sm font-medium" style={{ color: '#1e293b' }}>
+            Settings
+          </span>
           )}
         </button>
         <button
@@ -476,9 +476,9 @@ const Sidebar = ({
             }}
           ></i>
           {!isCollapsed && (
-            <span className="text-sm font-medium" style={{ color: currentView === 'coming-soon' ? '#1e293b' : '#1e293b' }}>
-              Upgrade to Premium
-            </span>
+          <span className="text-sm font-medium" style={{ color: currentView === 'coming-soon' ? '#1e293b' : '#1e293b' }}>
+            Upgrade to Premium
+          </span>
           )}
         </button>
       </div>
